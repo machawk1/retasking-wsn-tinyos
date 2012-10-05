@@ -145,8 +145,6 @@ public class BuildSource {
 	
 	if (source.equals("sf"))
 	    retVal =  makeArgsSF(args);
-	if (source.equals("serial"))
-	    retVal =  makeArgsSerial(args);
 	if (source.equals("network"))
 	    retVal =  makeArgsNetwork(args);
 	if (source.equals("tossim-serial"))
@@ -217,40 +215,6 @@ public class BuildSource {
 	}
 	catch (NumberFormatException e) { }
 	return -1;
-    }
- 
-
-    /**
-     * Make a serial-port packet source. Serial packet sources report
-     * missing acknowledgements via a false result to writePacket.
-     * @param args "COMn[:baudrate]" ("COM1" if args is null)
-     *   baudrate is an integer or mote name
-     *   The default baudrate is 19200.
-     * @return The new packet source, or null if the arguments are invalid
-     */
-    public static PacketSource makeArgsSerial(String args) {
-	if (args == null)
-	    args = "COM1";
-
-	ParseArgs parser = new ParseArgs(args, ":");
-	String port = parser.next();
-	String platformOrBaud = parser.next();
-	int baudrate = decodeBaudrate(platformOrBaud);
-	if (baudrate < 0)
-	    return null;
-	return makeSerial(port, baudrate);
-    }
-
-    /**
-     * Make a serial-port packet source. Serial packet sources report
-     * missing acknowledgements via a false result to writePacket.
-     * @param port javax.comm serial port name ("COMn:")
-     * @param baudrate requested baudrate
-     * @return The new packet source
-     */ 
-    public static PacketSource makeSerial(String port, int baudrate) {
-	return new Packetizer("serial@" + port + ":" + baudrate,
-			      new SerialByteSource(port, baudrate));
     }
 
     /**
