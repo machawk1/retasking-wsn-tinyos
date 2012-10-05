@@ -126,7 +126,7 @@ public class BuildSource {
      * @return The packet source, or null if it could not be made
      */
     public static PacketSource makePacketSource() {
-	return makePacketSource(Env.getenv("MOTECOM"));
+	return makePacketSource(null);
     }
 
     /**
