@@ -89,6 +89,7 @@ implementation {
       }
 
       rcm->counter = counter;
+      rcm->nodeid = TOS_NODE_ID;
       if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(test_serial_msg_t)) == SUCCESS) {
 	locked = TRUE;
       }

@@ -3,6 +3,7 @@
 #define TEST_SERIAL_H
 
 typedef nx_struct test_serial_msg {
+  nx_uint16_t nodeid;
   nx_uint16_t counter;
 } test_serial_msg_t;
 
