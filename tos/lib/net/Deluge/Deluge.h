@@ -66,7 +66,15 @@ enum {
   DELUGE_CMD_DISSEMINATE_AND_REPROGRAM = 4,
   DELUGE_CMD_REPROGRAM = 5, // Reprogram the local mote
   DELUGE_CMD_REBOOT = 6,    // Reboot the local mode
+  DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES = 7, //Reprogram/Reboot nodes set in "nodeIds"
+  DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_GROUP = 8, //Reprogram/Reboot nodes matching "groupId"
+  DELUGE_CMD_UPDATE_GROUP = 9 //Update nodes groupId
 };
+
+#ifndef GROUPID
+    #define GROUPID 1
+    #warning "Default GROUPID set (value = 1)"
+#endif
 
 #define UQ_DELUGE_METADATA "DelugeMetadata.client"
 #define UQ_DELUGE_VOLUME_MANAGER "DelugeVolumeManager.client"
@@ -76,6 +84,8 @@ typedef nx_struct DelugeCmd {
   nx_uint32_t uidhash;  // unique id of image
   nx_uint8_t  imgNum;   // image number
   nx_uint32_t size;     // size of the image
+  nx_uint32_t nodeIds;  // Nodes to update
+  nx_uint8_t groupId;   // Group id
 } DelugeCmd;
 
 typedef struct BootArgs {
