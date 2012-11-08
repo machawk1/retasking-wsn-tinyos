@@ -59,6 +59,8 @@ implementation
   typedef nx_struct SerialReqPacket {
     nx_uint8_t cmd;
     nx_uint8_t imgNum;
+    nx_uint32_t nodeIds;  // Nodes to update
+    nx_uint8_t groupId;   // Group id
   } SerialReqPacket;
   
   typedef nx_struct SerialReplyPacket {
@@ -97,13 +99,24 @@ implementation
       break;
     case DELUGE_CMD_ONLY_DISSEMINATE:
     case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM:
+    case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES:
+    case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_GROUP:
+      delugeCmd.nodeIds = request->nodeIds;
+      delugeCmd.groupId = request->groupId;
+
       if (request->imgNum != NON_DELUGE_VOLUME &&
-	  (call Resource.isOwner() || 
-	   call Resource.immediateRequest() == SUCCESS)) {
-	call DelugeMetadata.read(request->imgNum);
+              (call Resource.isOwner() || 
+               call Resource.immediateRequest() == SUCCESS)) {
+          call DelugeMetadata.read(request->imgNum);
       } else {
-	sendReply(FAIL);
+          sendReply(FAIL);
       }
+      break;
+    case DELUGE_CMD_UPDATE_GROUP:
+      delugeCmd.nodeIds = request->nodeIds;
+      delugeCmd.groupId = request->groupId;
+      call DisseminationUpdate.change(&delugeCmd);
+      sendReply(SUCCESS);
       break;
     case DELUGE_CMD_REPROGRAM:
     case DELUGE_CMD_REBOOT:
@@ -116,6 +129,7 @@ implementation
       sendReply(SUCCESS);
       break;
     }
+    
     return msg;
   }
 
@@ -141,6 +155,8 @@ implementation
     switch (delugeCmd.type) {
     case DELUGE_CMD_ONLY_DISSEMINATE:
     case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM:
+    case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES:
+    case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_GROUP:
       delugeCmd.uidhash = ident->uidhash;
       delugeCmd.size = ident->size;
       call DisseminationUpdate.change(&delugeCmd);

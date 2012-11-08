@@ -66,6 +66,9 @@ DM_CMD_ONLY_DISSEMINATE = 3
 DM_CMD_DISSEMINATE_AND_REPROGRAM = 4
 DM_CMD_REPROGRAM        = 5
 DM_CMD_BOOT             = 6
+DM_CMD_DISSEMINATE_AND_REPROGRAM_NODES = 7, # Reprogram/Reboot nodes set in "nodeIds"
+DM_CMD_DISSEMINATE_AND_REPROGRAM_GROUP = 8, # Reprogram/Reboot nodes matching "groupId"
+DM_CMD_UPDATE_GROUP = 9 # Update nodes groupId
 
 ERROR_SUCCESS = 0   # T2-compatible
 ERROR_FAIL    = 1   # T2-compatible
@@ -89,7 +92,9 @@ class DMReqPacket(tos.Packet):
     def __init__(self, packet = None):
         tos.Packet.__init__(self,
                             [('cmd',    'int',  1),
-                             ('imgNum', 'int',  1)],
+                             ('imgNum', 'int',  1),
+                             ('nodeIds', 'int', 4),
+                             ('groupId', 'int', 1)],
                             packet)
 
 class SerialReplyPacket(tos.Packet):
@@ -380,6 +385,16 @@ def disseminateAndReboot(imgNum):
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to disseminate-and-reboot")
 
+def disseminateAndRebootNodes(imgNum, nodeIds):
+    sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM_NODES, imgNum))
+    success = am.write(sreqpkt, DM_AMID)
+    return handleResponse(success, "ERROR: Unable to disseminate-and-reboot-nodes")
+
+def disseminateAndRebootGroup(imgNum, groupId):
+    sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM_GROUP, imgNum))
+    success = am.write(sreqpkt, DM_AMID)
+    return handleResponse(success, "ERROR: Unable to disseminate-and-reboot-group-id")
+
 def stop():
     sreqpkt = DMReqPacket((DM_CMD_STOP, 0))
     success = am.write(sreqpkt, DM_AMID)
@@ -403,6 +418,8 @@ def print_usage():
     print "  -r --reprogram   Reprogram the mote"
     print "  -d --disseminate Disseminate the image in the external flash to the network"
     print "  -dr --disseminate-and-reprogram"
+    print "  -drn --disseminate-and-reprogram-nodes"
+    print "  -drg --disseminate-and-reprogram-group"
     print "  -s --stop        Stop the dissemination "
     print "  -ls --local-stop Stop the dissemination only on the local mote"
 
@@ -457,6 +474,14 @@ if len(sys.argv) >= 3:
     elif sys.argv[2] in ["-dr", "--disseminate-and-reboot"]:
         checkImgNum()
         if disseminateAndReboot(imgNum):
+            print "Command sent"
+    elif sys.argv[2] in ["-drn", "--disseminate-and-reboot-nodes"]:
+        checkImgNum()
+        if disseminateAndRebootNodes(imgNum, 0):
+            print "Command sent"
+    elif sys.argv[2] in ["-drg", "--disseminate-and-reboot-group"]:
+        checkImgNum()
+        if disseminateAndRebootGroup(imgNum, 0):
             print "Command sent"
     elif sys.argv[2] in ["-s", "--stop"]:
         if stop():

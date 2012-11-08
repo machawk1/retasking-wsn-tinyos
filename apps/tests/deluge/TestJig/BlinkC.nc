@@ -42,6 +42,20 @@
 
 #include<math.h>
 
+typedef nx_struct DelugeIdent {
+  nx_uint32_t  uidhash;        // unique id of the image
+  nx_uint32_t  size;           // size of the whole image (ident + CRCs + binary)
+  nx_uint8_t   numPgs;         // number of pages of complete image
+  nx_uint8_t   reserved;
+  nx_uint16_t  crc;            // crc over the above 4 fields
+  nx_uint8_t   appname[16];
+  nx_uint8_t   username[16];
+  nx_uint8_t   hostname[16];
+  nx_uint8_t   platform[16];
+  nx_uint32_t  timestamp;
+  nx_uint32_t  userhash;
+} DelugeIdent;
+
 module BlinkC @safe()
 {
     uses interface Boot;
@@ -71,6 +85,8 @@ implementation
 
 
                 isNodeIdSet(value);
+
+                dbg("Boot", "Size of DelugeIdent struct: (%u)\n", sizeof(DelugeIdent));
 
         dbg("Boot", "Boot End.......\n");
     }
