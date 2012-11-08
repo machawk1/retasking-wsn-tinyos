@@ -366,42 +366,47 @@ def ping(imgNum):
     return False
 
 def boot():
-    sreqpkt = DMReqPacket((DM_CMD_BOOT, 0))
+    sreqpkt = DMReqPacket((DM_CMD_BOOT, 0, 0, 0))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to boot the mote")
 
 def reprogram(imgNum):
-    sreqpkt = DMReqPacket((DM_CMD_REPROGRAM, imgNum))
+    sreqpkt = DMReqPacket((DM_CMD_REPROGRAM, imgNum, 0, 0))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to reprogram the mote")
 
 def disseminate(imgNum):
-    sreqpkt = DMReqPacket((DM_CMD_ONLY_DISSEMINATE, imgNum))
+    sreqpkt = DMReqPacket((DM_CMD_ONLY_DISSEMINATE, imgNum, 0, 0))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to disseminate")
 
 def disseminateAndReboot(imgNum):
-    sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM, imgNum))
+    sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM, imgNum, 0, 0))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to disseminate-and-reboot")
 
 def disseminateAndRebootNodes(imgNum, nodeIds):
-    sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM_NODES, imgNum))
+    sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM_NODES, imgNum, nodeIds, 0))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to disseminate-and-reboot-nodes")
 
 def disseminateAndRebootGroup(imgNum, groupId):
-    sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM_GROUP, imgNum))
+    sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM_GROUP, imgNum, 0, groupId))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to disseminate-and-reboot-group-id")
 
+def updateNodesGroupId(nodesId, groupId):
+    sreqpkt = DMReqPacket((DM_CMD_UPDATE_GROUP, 0, nodesId, groupId))
+    success = am.write(sreqpkt, DM_AMID)
+    return handleResponse(success, "ERROR: Unable to update-nodes-group-id")
+
 def stop():
-    sreqpkt = DMReqPacket((DM_CMD_STOP, 0))
+    sreqpkt = DMReqPacket((DM_CMD_STOP, 0, 0, 0))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to initiate the stop")
 
 def localstop():
-    sreqpkt = DMReqPacket((DM_CMD_LOCAL_STOP, 0))
+    sreqpkt = DMReqPacket((DM_CMD_LOCAL_STOP, 0, 0, 0))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to initiate the local stop")
 
@@ -420,6 +425,7 @@ def print_usage():
     print "  -dr --disseminate-and-reprogram"
     print "  -drn --disseminate-and-reprogram-nodes"
     print "  -drg --disseminate-and-reprogram-group"
+    print "  -ung --update-nodes-group-id"
     print "  -s --stop        Stop the dissemination "
     print "  -ls --local-stop Stop the dissemination only on the local mote"
 
@@ -482,6 +488,9 @@ if len(sys.argv) >= 3:
     elif sys.argv[2] in ["-drg", "--disseminate-and-reboot-group"]:
         checkImgNum()
         if disseminateAndRebootGroup(imgNum, 0):
+            print "Command sent"
+    elif sys.argv[2] in ["-ung", "--update-nodes-group-id"]:
+        if updateNodesGroupId(0, 0):
             print "Command sent"
     elif sys.argv[2] in ["-s", "--stop"]:
         if stop():
