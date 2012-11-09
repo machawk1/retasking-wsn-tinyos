@@ -66,8 +66,8 @@ DM_CMD_ONLY_DISSEMINATE = 3
 DM_CMD_DISSEMINATE_AND_REPROGRAM = 4
 DM_CMD_REPROGRAM        = 5
 DM_CMD_BOOT             = 6
-DM_CMD_DISSEMINATE_AND_REPROGRAM_NODES = 7, # Reprogram/Reboot nodes set in "nodeIds"
-DM_CMD_DISSEMINATE_AND_REPROGRAM_GROUP = 8, # Reprogram/Reboot nodes matching "groupId"
+DM_CMD_DISSEMINATE_AND_REPROGRAM_NODES = 7 # Reprogram/Reboot nodes set in "nodeIds"
+DM_CMD_DISSEMINATE_AND_REPROGRAM_GROUP = 8 # Reprogram/Reboot nodes matching "groupId"
 DM_CMD_UPDATE_GROUP = 9 # Update nodes groupId
 
 ERROR_SUCCESS = 0   # T2-compatible
@@ -386,17 +386,20 @@ def disseminateAndReboot(imgNum):
     return handleResponse(success, "ERROR: Unable to disseminate-and-reboot")
 
 def disseminateAndRebootNodes(imgNum, nodeIds):
+    print "DisseminateAndRebootNodes imgNum:(%d) nodeIds:(%d)" % (imgNum, nodeIds) 
     sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM_NODES, imgNum, nodeIds, 0))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to disseminate-and-reboot-nodes")
 
 def disseminateAndRebootGroup(imgNum, groupId):
+    print "DisseminateAndRebootGroup imgNum:(%d) groupIds:(%d)" % (imgNum, groupId)
     sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM_GROUP, imgNum, 0, groupId))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to disseminate-and-reboot-group-id")
 
-def updateNodesGroupId(nodesId, groupId):
-    sreqpkt = DMReqPacket((DM_CMD_UPDATE_GROUP, 0, nodesId, groupId))
+def updateNodesGroupId(nodeIds, groupId):
+    print "UpdateNodesGroupId nodeIds:(%d) groupId:(%d)" % (nodeIds, groupId) 
+    sreqpkt = DMReqPacket((DM_CMD_UPDATE_GROUP, 0, nodeIds, groupId))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to update-nodes-group-id")
 
@@ -442,6 +445,33 @@ def checkImgNum():
         sys.exit(-1)
     return imgNum
 
+def checkNodeIdsNum(index):
+    global nodeIdsNum
+
+    if len(sys.argv) <= index:
+        print "ERROR: Please supply NodeIds"
+        sys.exit(-1)
+    try:
+        nodeIdsNum = int(sys.argv[index])
+    except:
+        print "ERROR: NodeIds number is not valid"
+        sys.exit(-1)
+    return nodeIdsNum
+        
+
+def checkGroupIdNum(index):
+    global groupIdNum
+
+    if len(sys.argv) <= index:
+        print "ERROR: Please supply GroupId"
+        sys.exit(-1)
+    try:
+        groupIdNum = int(sys.argv[index])
+    except:
+        print "ERROR: GroupId number is not valid"
+        sys.exit(-1)
+    return groupIdNum
+
 # ======== MAIN ======== #
 if len(sys.argv) >= 3:
 
@@ -483,14 +513,18 @@ if len(sys.argv) >= 3:
             print "Command sent"
     elif sys.argv[2] in ["-drn", "--disseminate-and-reboot-nodes"]:
         checkImgNum()
-        if disseminateAndRebootNodes(imgNum, 0):
+        checkNodeIdsNum(4)
+        if disseminateAndRebootNodes(imgNum, nodeIdsNum):
             print "Command sent"
     elif sys.argv[2] in ["-drg", "--disseminate-and-reboot-group"]:
         checkImgNum()
-        if disseminateAndRebootGroup(imgNum, 0):
+        checkGroupIdNum(4)
+        if disseminateAndRebootGroup(imgNum, groupIdNum):
             print "Command sent"
     elif sys.argv[2] in ["-ung", "--update-nodes-group-id"]:
-        if updateNodesGroupId(0, 0):
+        checkNodeIdsNum(3)
+        checkGroupIdNum(4)
+        if updateNodesGroupId(nodeIdsNum, groupIdNum):
             print "Command sent"
     elif sys.argv[2] in ["-s", "--stop"]:
         if stop():
