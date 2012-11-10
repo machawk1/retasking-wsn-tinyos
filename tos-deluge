@@ -380,19 +380,19 @@ def disseminate(imgNum):
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to disseminate")
 
-def disseminateAndReboot(imgNum):
+def disseminateAndReprogram(imgNum):
     sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM, imgNum, 0, 0))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to disseminate-and-reboot")
 
-def disseminateAndRebootNodes(imgNum, nodeIds):
+def disseminateAndReprogramNodes(imgNum, nodeIds):
     print "DisseminateAndRebootNodes imgNum:(%d) nodeIds:(%d)" % (imgNum, nodeIds) 
     sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM_NODES, imgNum, nodeIds, 0))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to disseminate-and-reboot-nodes")
 
-def disseminateAndRebootGroup(imgNum, groupId):
-    print "DisseminateAndRebootGroup imgNum:(%d) groupIds:(%d)" % (imgNum, groupId)
+def disseminateAndReprogramGroup(imgNum, groupId):
+    print "DisseminateAndRebootGroup imgNum:(%d) groupId:(%d)" % (imgNum, groupId)
     sreqpkt = DMReqPacket((DM_CMD_DISSEMINATE_AND_REPROGRAM_GROUP, imgNum, 0, groupId))
     success = am.write(sreqpkt, DM_AMID)
     return handleResponse(success, "ERROR: Unable to disseminate-and-reboot-group-id")
@@ -426,9 +426,9 @@ def print_usage():
     print "  -r --reprogram   Reprogram the mote"
     print "  -d --disseminate Disseminate the image in the external flash to the network"
     print "  -dr --disseminate-and-reprogram"
-    print "  -drn --disseminate-and-reprogram-nodes"
-    print "  -drg --disseminate-and-reprogram-group"
-    print "  -ung --update-nodes-group-id"
+    print "  -drn --disseminate-and-reprogram-nodes (image_number node_ids)"
+    print "  -drg --disseminate-and-reprogram-group (image_number group_id)"
+    print "  -ung --update-nodes-group-id (node_ids group_id)"
     print "  -s --stop        Stop the dissemination "
     print "  -ls --local-stop Stop the dissemination only on the local mote"
 
@@ -509,17 +509,17 @@ if len(sys.argv) >= 3:
             print "Command sent"
     elif sys.argv[2] in ["-dr", "--disseminate-and-reboot"]:
         checkImgNum()
-        if disseminateAndReboot(imgNum):
+        if disseminateAndReprogram(imgNum):
             print "Command sent"
     elif sys.argv[2] in ["-drn", "--disseminate-and-reboot-nodes"]:
         checkImgNum()
         checkNodeIdsNum(4)
-        if disseminateAndRebootNodes(imgNum, nodeIdsNum):
+        if disseminateAndReprogramNodes(imgNum, nodeIdsNum):
             print "Command sent"
     elif sys.argv[2] in ["-drg", "--disseminate-and-reboot-group"]:
         checkImgNum()
         checkGroupIdNum(4)
-        if disseminateAndRebootGroup(imgNum, groupIdNum):
+        if disseminateAndReprogramGroup(imgNum, groupIdNum):
             print "Command sent"
     elif sys.argv[2] in ["-ung", "--update-nodes-group-id"]:
         checkNodeIdsNum(3)
