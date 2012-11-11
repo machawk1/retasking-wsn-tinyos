@@ -150,6 +150,25 @@ implementation
                 }
                 break;
             case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES:
+                if(isNodeIdSet(cmd->nodeIds)) {
+                    if (state == S_RECV) {
+                        if (cmd->uidhash == lastCmd.uidhash) {
+                            if (cmd->imgNum == lastCmd.imgNum) {
+                                // Same uidhash, same imgNum, only cmd should be
+                                // different.  That will be properly updated by the last
+                                // statement from this function.
+                                break;
+                            }
+                    }
+                        call stop();
+                    }
+                    if (cmd->uidhash != IDENT_UIDHASH) {
+                        call DelugeMetadata.read(cmd->imgNum);
+                    } else {
+                        state = S_PUB;
+                        request();
+                    }
+                }
                 break;
             case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_GROUP:
                 break;
