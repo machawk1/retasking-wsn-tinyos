@@ -72,8 +72,8 @@ enum {
 };
 
 #ifndef GROUPID
-    #define GROUPID 1
-    #warning "Default GROUPID set (value = 1)"
+    #define DELUGE_GROUP_ID 1
+    #warning "Default DELUGE_GROUP_ID set (value = 1)"
 #endif
 
 #define UQ_DELUGE_METADATA "DelugeMetadata.client"

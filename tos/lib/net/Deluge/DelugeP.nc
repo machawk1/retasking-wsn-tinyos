@@ -171,6 +171,25 @@ implementation
                 }
                 break;
             case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_GROUP:
+                if(cmd->groupId == DELUGE_GROUP_ID) {
+                    if (state == S_RECV) {
+                        if (cmd->uidhash == lastCmd.uidhash) {
+                            if (cmd->imgNum == lastCmd.imgNum) {
+                                // Same uidhash, same imgNum, only cmd should be
+                                // different.  That will be properly updated by the last
+                                // statement from this function.
+                                break;
+                            }
+                    }
+                        call stop();
+                    }
+                    if (cmd->uidhash != IDENT_UIDHASH) {
+                        call DelugeMetadata.read(cmd->imgNum);
+                    } else {
+                        state = S_PUB;
+                        request();
+                    }
+                }
                 break;
             case DELUGE_CMD_UPDATE_GROUP:
                 break;
@@ -191,6 +210,7 @@ implementation
                     request();
                     break;
                 case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM:
+                case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES:
                     call NetProg.programImageAndReboot(call StorageMap.getPhysicalAddress[lastCmd.imgNum](0));
                     break;
             }
@@ -203,7 +223,8 @@ implementation
     {
         //    printf("readDone 0x%lx imgNum: %d size: %lu\n", lastCmd.uidhash, lastCmd.imgNum, lastCmd.size);
         if (ident->uidhash == lastCmd.uidhash) {
-            if (lastCmd.type == DELUGE_CMD_DISSEMINATE_AND_REPROGRAM) {
+            if (lastCmd.type == DELUGE_CMD_DISSEMINATE_AND_REPROGRAM ||
+                lastCmd.type == DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES) {
                 call NetProg.programImageAndReboot(call StorageMap.getPhysicalAddress[imgNum](0));
             } else {
                 // We already have the image so we'll go ahead and start publishing.
