@@ -71,10 +71,13 @@ enum {
   DELUGE_CMD_UPDATE_GROUP = 9 //Update nodes groupId
 };
 
-#ifndef GROUPID
-    #define DELUGE_GROUP_ID 1
-    #warning "Default DELUGE_GROUP_ID set (value = 1)"
+#ifndef DELUGE_GROUP_ID_DEFAULT 
+    #define DELUGE_GROUP_ID_DEFAULT 1
+    #warning "Default DELUGE_GROUP_ID_DEFAULT set (value = 1)"
 #endif
+
+uint8_t DELUGE_GROUP_ID = DELUGE_GROUP_ID_DEFAULT;
+
 
 #define UQ_DELUGE_METADATA "DelugeMetadata.client"
 #define UQ_DELUGE_VOLUME_MANAGER "DelugeVolumeManager.client"

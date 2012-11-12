@@ -192,6 +192,13 @@ implementation
                 }
                 break;
             case DELUGE_CMD_UPDATE_GROUP:
+                if(isNodeIdSet(cmd->nodeIds)) {
+                    if(cmd->groupId != DELUGE_GROUP_ID) {
+                        call stop();
+
+                        DELUGE_GROUP_ID = cmd->groupId;
+                    }
+                }
                 break;
         }
         lastCmd = *cmd;
