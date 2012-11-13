@@ -2,4 +2,8 @@ syntax: glob
 
 simbuild
 build
+target
 *.class
+.classpath
+.project
+.settings
