@@ -1,51 +1,32 @@
 package net.tinyos.dviz;
 
-import javax.swing.SwingUtilities;
-
-import java.awt.EventQueue;
-import javax.swing.JFrame;
-import javax.swing.JTable;
 import java.awt.BorderLayout;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.JScrollPane;
-import javax.swing.JMenuBar;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import java.awt.Component;
-import java.awt.Insets;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.ScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.table.DefaultTableModel;
 
-public class MainWindow {
+@SuppressWarnings("serial")
+public class MainWindow extends JFrame {
 
-	private JFrame frame;
 	private JTable tbNodeStatus;
 	private JSplitPane spChild;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainWindow window = new MainWindow();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the application.
 	 */
 	public MainWindow() {
+		setTitle("Deluge Visualizer");
 		initialize();
 	}
 
@@ -53,32 +34,41 @@ public class MainWindow {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 596, 483);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		this.setBounds(100, 100, 722, 560);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JMenuBar menuBar = new JMenuBar();
-		frame.setJMenuBar(menuBar);
+		this.setJMenuBar(menuBar);
 
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 
 		JMenuItem mntmSettings = new JMenuItem("Settings");
+		mntmSettings.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				SettingsDialog settingsDialog = new SettingsDialog();
+				settingsDialog.display();
+
+			}
+		});
 		mnFile.add(mntmSettings);
 
-		
 		tbNodeStatus = new JTable();
-		tbNodeStatus.setModel(new DefaultTableModel(new Object[][] { { null, null,
-				null, null, null, null }, }, new String[] { "", "Node ID",
-				"Group ID", "State", "App UID", "App Name" }) {
-			Class[] columnTypes = new Class[] { Boolean.class, Integer.class,
-					Integer.class, String.class, Integer.class, String.class };
+		tbNodeStatus.setModel(new DefaultTableModel(new Object[][] { { null,
+				null, null, null, null, null }, }, new String[] { "",
+				"Node ID", "Group ID", "State", "App UID", "App Name" }) {
+			Class<?>[] columnTypes = new Class[] { Boolean.class,
+					Integer.class, Integer.class, String.class, Integer.class,
+					String.class };
 
-			public Class getColumnClass(int columnIndex) {
+			public Class<?> getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
 		});
-		
+
 		JScrollPane spTable = new JScrollPane();
 		spTable.setViewportView(tbNodeStatus);
 
@@ -87,26 +77,39 @@ public class MainWindow {
 		spChild.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		spChild.setOneTouchExpandable(true);
 		spChild.setResizeWeight(0.5);
-		
-		
+
 		spChild.setLeftComponent(spTable);
-		
+
 		JScrollPane spCommandTabs = new JScrollPane();
 		spChild.setRightComponent(spCommandTabs);
 
-		
+		JTabbedPane tpCommands = new JTabbedPane(JTabbedPane.TOP);
+		spCommandTabs.setViewportView(tpCommands);
+
+		JPanel pInstall = new JPanel();
+		JPanel pDisseminateReboot = new JPanel();
+		JPanel pDisseminateRebootNodes = new JPanel();
+		JPanel pDisseminateRebootGroup = new JPanel();
+		JPanel pUpdateGroup = new JPanel();
+
+		tpCommands.addTab("Install", pInstall);
+		tpCommands.addTab("Disseminate-Reboot", pDisseminateReboot);
+		tpCommands.addTab("Disseminate-Reboot-Nodes", pDisseminateRebootNodes);
+		tpCommands.addTab("Disseminate-Reboot-Group", pDisseminateRebootGroup);
+		tpCommands.addTab("Update-Group", pUpdateGroup);
+
 		JSplitPane spRoot = new JSplitPane();
 		spRoot.setDividerSize(7);
 		spRoot.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		spRoot.setOneTouchExpandable(true);
 		spRoot.setResizeWeight(0.66);
-		frame.getContentPane().add(spRoot, BorderLayout.CENTER);
-		
+		this.getContentPane().add(spRoot, BorderLayout.CENTER);
+
 		spRoot.setLeftComponent(spChild);
-		
+
 		JTextArea taConsole = new JTextArea();
 		spRoot.setRightComponent(taConsole);
-		
+
 	}
 
 }
