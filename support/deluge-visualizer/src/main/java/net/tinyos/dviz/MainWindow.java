@@ -14,12 +14,20 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
+import net.miginfocom.swing.MigLayout;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
 	private JTable tbNodeStatus;
 	private JSplitPane spChild;
+	private JTextField tfInstallTosImagePath;
+	private JTextField tfInstallCmd;
 
 
 	/**
@@ -93,6 +101,39 @@ public class MainWindow extends JFrame {
 		JPanel pUpdateGroup = new JPanel();
 
 		tpCommands.addTab("Install", pInstall);
+		pInstall.setLayout(new MigLayout("", "[][grow][]", "[][][]"));
+		
+		JLabel lblImageNumber = new JLabel("image number:");
+		pInstall.add(lblImageNumber, "cell 0 0,alignx trailing");
+		
+		JComboBox cbInstallImgNum = new JComboBox();
+		cbInstallImgNum.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4"}));
+		pInstall.add(cbInstallImgNum, "flowx,cell 1 0,growx");
+		
+		JLabel lblTosimagexml = new JLabel("tos_image.xml path:");
+		pInstall.add(lblTosimagexml, "cell 0 1,alignx trailing");
+		
+		tfInstallTosImagePath = new JTextField();
+		tfInstallTosImagePath.setText("path to tos_image.xml");
+		tfInstallTosImagePath.setEditable(false);
+		pInstall.add(tfInstallTosImagePath, "cell 1 1,growx");
+		tfInstallTosImagePath.setColumns(10);
+		
+		JButton btnInstallBrowse = new JButton("Browse");
+		pInstall.add(btnInstallBrowse, "cell 2 1");
+		
+		JLabel lblCommand = new JLabel("command:");
+		pInstall.add(lblCommand, "cell 0 2,alignx trailing");
+		
+		tfInstallCmd = new JTextField();
+		tfInstallCmd.setText("tos-deluge command");
+		tfInstallCmd.setToolTipText("");
+		tfInstallCmd.setEditable(false);
+		pInstall.add(tfInstallCmd, "cell 1 2,growx");
+		tfInstallCmd.setColumns(10);
+		
+		JButton btnInstallExecute = new JButton("Execute");
+		pInstall.add(btnInstallExecute, "cell 2 2");
 		tpCommands.addTab("Disseminate-Reboot", pDisseminateReboot);
 		tpCommands.addTab("Disseminate-Reboot-Nodes", pDisseminateRebootNodes);
 		tpCommands.addTab("Disseminate-Reboot-Group", pDisseminateRebootGroup);
