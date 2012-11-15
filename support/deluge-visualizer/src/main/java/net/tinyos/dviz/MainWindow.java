@@ -28,6 +28,7 @@ public class MainWindow extends JFrame {
 	private JSplitPane spChild;
 	private JTextField tfInstallTosImagePath;
 	private JTextField tfInstallCmd;
+	private JTextField tfDrCmd;
 
 
 	/**
@@ -103,8 +104,8 @@ public class MainWindow extends JFrame {
 		tpCommands.addTab("Install", pInstall);
 		pInstall.setLayout(new MigLayout("", "[][grow][]", "[][][]"));
 		
-		JLabel lblImageNumber = new JLabel("image number:");
-		pInstall.add(lblImageNumber, "cell 0 0,alignx trailing");
+		JLabel lblInstallImgNum = new JLabel("image number:");
+		pInstall.add(lblInstallImgNum, "cell 0 0,alignx trailing");
 		
 		JComboBox cbInstallImgNum = new JComboBox();
 		cbInstallImgNum.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4"}));
@@ -122,8 +123,8 @@ public class MainWindow extends JFrame {
 		JButton btnInstallBrowse = new JButton("Browse");
 		pInstall.add(btnInstallBrowse, "cell 2 1");
 		
-		JLabel lblCommand = new JLabel("command:");
-		pInstall.add(lblCommand, "cell 0 2,alignx trailing");
+		JLabel lblInstallCmd = new JLabel("command:");
+		pInstall.add(lblInstallCmd, "cell 0 2,alignx trailing");
 		
 		tfInstallCmd = new JTextField();
 		tfInstallCmd.setText("tos-deluge command");
@@ -135,7 +136,28 @@ public class MainWindow extends JFrame {
 		JButton btnInstallExecute = new JButton("Execute");
 		pInstall.add(btnInstallExecute, "cell 2 2");
 		tpCommands.addTab("Disseminate-Reboot", pDisseminateReboot);
+		pDisseminateReboot.setLayout(new MigLayout("", "[][grow][]", "[][]"));
+		
+		JLabel lblDrImgNum = new JLabel("image number:");
+		pDisseminateReboot.add(lblDrImgNum, "cell 0 0,alignx trailing");
+		
+		JComboBox cbDrImgNum = new JComboBox();
+		cbDrImgNum.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4"}));
+		pDisseminateReboot.add(cbDrImgNum, "cell 1 0,growx");
+		
+		JLabel lblDrCmd = new JLabel("command:");
+		pDisseminateReboot.add(lblDrCmd, "cell 0 1,alignx trailing");
+		
+		tfDrCmd = new JTextField();
+		tfDrCmd.setEditable(false);
+		tfDrCmd.setText("tos-deluge command");
+		pDisseminateReboot.add(tfDrCmd, "cell 1 1,growx");
+		tfDrCmd.setColumns(10);
+		
+		JButton btnDrExecute = new JButton("Execute");
+		pDisseminateReboot.add(btnDrExecute, "cell 2 1");
 		tpCommands.addTab("Disseminate-Reboot-Nodes", pDisseminateRebootNodes);
+		pDisseminateRebootNodes.setLayout(new MigLayout("", "[]", "[]"));
 		tpCommands.addTab("Disseminate-Reboot-Group", pDisseminateRebootGroup);
 		tpCommands.addTab("Update-Group", pUpdateGroup);
 
