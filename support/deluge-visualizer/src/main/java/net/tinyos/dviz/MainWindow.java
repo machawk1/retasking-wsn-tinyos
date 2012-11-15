@@ -1,9 +1,17 @@
 package net.tinyos.dviz;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.ComponentOrientation;
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -13,13 +21,10 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.BevelBorder;
 import javax.swing.table.DefaultTableModel;
 import net.miginfocom.swing.MigLayout;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
@@ -268,6 +273,18 @@ public class MainWindow extends JFrame {
 		taConsole.setEditable(false);
 	}
 
+	private void initializeStatusPanel(JPanel pStatus) {
+
+		pStatus.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		pStatus.setPreferredSize(new Dimension(this.getWidth(), 18));
+		pStatus.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		pStatus.setLayout(new BoxLayout(pStatus, BoxLayout.LINE_AXIS));
+
+		JButton btnConnection = new JButton("Disconnected");
+		btnConnection.setBackground(Color.RED);
+		pStatus.add(btnConnection);
+	}
+
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -332,6 +349,10 @@ public class MainWindow extends JFrame {
 
 		spRoot.setLeftComponent(spChild);
 		spRoot.setRightComponent(taConsole);
+
+		JPanel pStatus = new JPanel();
+		initializeStatusPanel(pStatus);
+		getContentPane().add(pStatus, BorderLayout.SOUTH);
 
 	}
 }
