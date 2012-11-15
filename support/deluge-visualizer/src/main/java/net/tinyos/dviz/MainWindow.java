@@ -31,6 +31,11 @@ public class MainWindow extends JFrame {
 	private JTextField tfDrCmd;
 	private JTextField tfDrnNodeIds;
 	private JTextField tfDrnCmd;
+	private JTextField tfDrgGroupId;
+	private JTextField tfDrgCmd;
+	private JTextField tfUngGroupId;
+	private JTextField tfUngNodeIds;
+	private JTextField tfUngCmd;
 
 
 	/**
@@ -177,8 +182,8 @@ public class MainWindow extends JFrame {
 		pDisseminateRebootNodes.add(tfDrnNodeIds, "cell 1 1,growx");
 		tfDrnNodeIds.setColumns(10);
 		
-		JButton btnUpdate = new JButton("Update");
-		pDisseminateRebootNodes.add(btnUpdate, "cell 2 1");
+		JButton btnDrnUpdate = new JButton("Update");
+		pDisseminateRebootNodes.add(btnDrnUpdate, "cell 2 1");
 		
 		JLabel lblDrnCmd = new JLabel("command:");
 		pDisseminateRebootNodes.add(lblDrnCmd, "cell 0 2,alignx trailing");
@@ -192,7 +197,75 @@ public class MainWindow extends JFrame {
 		JButton btnDrnExecute = new JButton("Execute");
 		pDisseminateRebootNodes.add(btnDrnExecute, "cell 2 2");
 		tpCommands.addTab("Disseminate-Reboot-Group", pDisseminateRebootGroup);
+		pDisseminateRebootGroup.setLayout(new MigLayout("", "[][grow][]", "[][][]"));
+		
+		JLabel lblDrgImgNum = new JLabel("image number:");
+		pDisseminateRebootGroup.add(lblDrgImgNum, "cell 0 0,alignx trailing");
+		
+		JComboBox cbDrgImgNum = new JComboBox();
+		cbDrgImgNum.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4"}));
+		pDisseminateRebootGroup.add(cbDrgImgNum, "cell 1 0,growx");
+		
+		JLabel lblDrgGroupId = new JLabel("group ID:");
+		pDisseminateRebootGroup.add(lblDrgGroupId, "cell 0 1,alignx trailing");
+		
+		tfDrgGroupId = new JTextField();
+		tfDrgGroupId.setText("1");
+		pDisseminateRebootGroup.add(tfDrgGroupId, "cell 1 1,growx");
+		tfDrgGroupId.setColumns(10);
+		
+		JLabel lblDrgCmd = new JLabel("command:");
+		pDisseminateRebootGroup.add(lblDrgCmd, "cell 0 2,alignx trailing");
+		
+		tfDrgCmd = new JTextField();
+		tfDrgCmd.setText("tos-deluge command");
+		tfDrgCmd.setEditable(false);
+		pDisseminateRebootGroup.add(tfDrgCmd, "cell 1 2,growx");
+		tfDrgCmd.setColumns(10);
+		
+		JButton btnDrgExecute = new JButton("Execute");
+		pDisseminateRebootGroup.add(btnDrgExecute, "cell 2 2");
 		tpCommands.addTab("Update-Group", pUpdateGroup);
+		pUpdateGroup.setLayout(new MigLayout("", "[][grow][]", "[][][][]"));
+		
+		JLabel lblUngImgNum = new JLabel("image number:");
+		pUpdateGroup.add(lblUngImgNum, "cell 0 0,alignx trailing");
+		
+		JComboBox cbUngImgNum = new JComboBox();
+		cbUngImgNum.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4"}));
+		pUpdateGroup.add(cbUngImgNum, "cell 1 0,growx");
+		
+		JLabel lblUngGroupId = new JLabel("group ID:");
+		pUpdateGroup.add(lblUngGroupId, "cell 0 1,alignx trailing");
+		
+		tfUngGroupId = new JTextField();
+		tfUngGroupId.setText("1");
+		pUpdateGroup.add(tfUngGroupId, "cell 1 1,growx");
+		tfUngGroupId.setColumns(10);
+		
+		JLabel lblUngNodeIds = new JLabel("node IDs:");
+		pUpdateGroup.add(lblUngNodeIds, "cell 0 2,alignx trailing");
+		
+		tfUngNodeIds = new JTextField();
+		tfUngNodeIds.setEditable(false);
+		tfUngNodeIds.setText("hashed value");
+		pUpdateGroup.add(tfUngNodeIds, "cell 1 2,growx");
+		tfUngNodeIds.setColumns(10);
+		
+		JButton btnUngUpdate = new JButton("Update");
+		pUpdateGroup.add(btnUngUpdate, "cell 2 2");
+		
+		JLabel lblUngCmd = new JLabel("command:");
+		pUpdateGroup.add(lblUngCmd, "cell 0 3,alignx trailing");
+		
+		tfUngCmd = new JTextField();
+		tfUngCmd.setEditable(false);
+		tfUngCmd.setText("tos-deluge command");
+		pUpdateGroup.add(tfUngCmd, "cell 1 3,growx");
+		tfUngCmd.setColumns(10);
+		
+		JButton btnUngExecute = new JButton("Execute");
+		pUpdateGroup.add(btnUngExecute, "cell 2 3");
 
 		JSplitPane spRoot = new JSplitPane();
 		spRoot.setDividerSize(7);
