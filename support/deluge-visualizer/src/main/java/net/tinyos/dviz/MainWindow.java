@@ -29,6 +29,8 @@ public class MainWindow extends JFrame {
 	private JTextField tfInstallTosImagePath;
 	private JTextField tfInstallCmd;
 	private JTextField tfDrCmd;
+	private JTextField tfDrnNodeIds;
+	private JTextField tfDrnCmd;
 
 
 	/**
@@ -157,7 +159,38 @@ public class MainWindow extends JFrame {
 		JButton btnDrExecute = new JButton("Execute");
 		pDisseminateReboot.add(btnDrExecute, "cell 2 1");
 		tpCommands.addTab("Disseminate-Reboot-Nodes", pDisseminateRebootNodes);
-		pDisseminateRebootNodes.setLayout(new MigLayout("", "[]", "[]"));
+		pDisseminateRebootNodes.setLayout(new MigLayout("", "[][grow][]", "[][][]"));
+		
+		JLabel lbDrnImgNum = new JLabel("image number:");
+		pDisseminateRebootNodes.add(lbDrnImgNum, "cell 0 0,alignx trailing");
+		
+		JComboBox cbDrnImgNum = new JComboBox();
+		cbDrnImgNum.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4"}));
+		pDisseminateRebootNodes.add(cbDrnImgNum, "cell 1 0,growx");
+		
+		JLabel lblDrnNodeIds = new JLabel("node IDs:");
+		pDisseminateRebootNodes.add(lblDrnNodeIds, "cell 0 1,alignx trailing");
+		
+		tfDrnNodeIds = new JTextField();
+		tfDrnNodeIds.setText("hashed value");
+		tfDrnNodeIds.setEditable(false);
+		pDisseminateRebootNodes.add(tfDrnNodeIds, "cell 1 1,growx");
+		tfDrnNodeIds.setColumns(10);
+		
+		JButton btnUpdate = new JButton("Update");
+		pDisseminateRebootNodes.add(btnUpdate, "cell 2 1");
+		
+		JLabel lblDrnCmd = new JLabel("command:");
+		pDisseminateRebootNodes.add(lblDrnCmd, "cell 0 2,alignx trailing");
+		
+		tfDrnCmd = new JTextField();
+		tfDrnCmd.setEditable(false);
+		tfDrnCmd.setText("tos-deluge command");
+		pDisseminateRebootNodes.add(tfDrnCmd, "cell 1 2,growx,aligny top");
+		tfDrnCmd.setColumns(10);
+		
+		JButton btnDrnExecute = new JButton("Execute");
+		pDisseminateRebootNodes.add(btnDrnExecute, "cell 2 2");
 		tpCommands.addTab("Disseminate-Reboot-Group", pDisseminateRebootGroup);
 		tpCommands.addTab("Update-Group", pUpdateGroup);
 
