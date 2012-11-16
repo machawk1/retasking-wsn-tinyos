@@ -27,8 +27,7 @@ public class App {
 
 	private static void setWindowsLookAndFeel() {
 		try {
-			UIManager
-					.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (InstantiationException e1) {

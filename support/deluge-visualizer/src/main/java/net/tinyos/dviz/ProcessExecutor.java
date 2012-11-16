@@ -32,6 +32,11 @@ public class ProcessExecutor {
 		public String getOutput() {
 			return output;
 		}
+		
+		@Override
+		public String toString() {
+			return String.format("Status: (%s)\nOutput: %s", status, output);
+		}
 
 	}
 
