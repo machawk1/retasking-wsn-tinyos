@@ -1,5 +1,9 @@
 package net.tinyos.dviz;
 
+import java.util.Collections;
+
+import java.util.Map;
+
 import net.tinyos.dviz.ProcessExecutor.ProcessResult.Status;
 
 import java.io.PrintWriter;
@@ -32,10 +36,39 @@ public class ProcessExecutor {
 		public String getOutput() {
 			return output;
 		}
-		
+
 		@Override
 		public String toString() {
 			return String.format("Status: (%s)\nOutput: %s", status, output);
+		}
+
+	}
+
+	private Map<String, String> envVariables;
+
+	public ProcessExecutor() {
+
+		this(Collections.<String, String> emptyMap());
+	}
+
+	public ProcessExecutor(Map<String, String> envVariables) {
+
+		this.envVariables = envVariables;
+	}
+
+	private void setEnvVariablesOnlyIfTheyDontExist(
+			ProcessBuilder processBuilder) {
+
+		Map<String, String> currentEnvVariables = processBuilder.environment();
+
+		for (Map.Entry<String, String> entry : envVariables.entrySet()) {
+
+			if (currentEnvVariables.containsKey(entry.getKey()) == false) {
+
+				System.out.println(String.format("(%s) not set, value (%s)", entry.getKey(), entry.getValue()));
+				currentEnvVariables.put(entry.getKey(), entry.getValue());
+			}
+
 		}
 
 	}
@@ -44,6 +77,8 @@ public class ProcessExecutor {
 
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		processBuilder.redirectErrorStream(true);
+		setEnvVariablesOnlyIfTheyDontExist(processBuilder);
+
 		BufferedReader outputFromProcess = null;
 
 		ProcessResult returnValue = new ProcessResult(Status.Unknown, "");
@@ -59,6 +94,7 @@ public class ProcessExecutor {
 
 			while ((line = outputFromProcess.readLine()) != null) {
 
+				// TODO: Should the newline be added back
 				output.append(line);
 			}
 

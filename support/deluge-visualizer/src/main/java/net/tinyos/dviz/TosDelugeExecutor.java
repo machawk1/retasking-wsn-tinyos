@@ -1,5 +1,7 @@
 package net.tinyos.dviz;
 
+import java.util.Map;
+
 import net.tinyos.dviz.ProcessExecutor.ProcessResult;
 
 public class TosDelugeExecutor {
@@ -7,10 +9,10 @@ public class TosDelugeExecutor {
 	private String source;
 	private ProcessExecutor processExecutor;
 
-	public TosDelugeExecutor(String source) {
+	public TosDelugeExecutor(String source, Map<String, String> envVariables) {
 
 		this.source = source;
-		this.processExecutor = new ProcessExecutor();
+		this.processExecutor = new ProcessExecutor(envVariables);
 	}
 
 	public ProcessResult install(int imageNum, String pathToTosImageXml) {
