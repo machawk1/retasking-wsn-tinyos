@@ -1,0 +1,27 @@
+<assembly>
+    <id>assembly</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <fileSets>
+        <!-- Include the dviz-VERSION.jar in the zip  -->
+        <fileSet>
+            <directory>target</directory>
+            <includes>
+                <include>${project.artifactId}*.jar</include>
+            </includes>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+    </fileSets>
+
+    <!-- Copy all the dependencies into the lib folder (excluding the dviz-VERSION.jar -->
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>lib</outputDirectory>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+    </dependencySets>
+</assembly>
+
