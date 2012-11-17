@@ -52,6 +52,9 @@ public class MainWindow extends JFrame {
 	private String source = "serial@/dev/ttyUSB1:57600";
 	private JComboBox cbInstallImgNum;
 	private JTextArea taConsole;
+	private JComboBox cbDrnImgNum;
+	private JComboBox cbDrImgNum;
+	private JComboBox cbDrgImgNum;
 
 	/**
 	 * Create the application.
@@ -75,7 +78,7 @@ public class MainWindow extends JFrame {
 		JLabel lblDrImgNum = new JLabel("image number:");
 		pDisseminateReboot.add(lblDrImgNum, "cell 0 0,alignx trailing");
 
-		JComboBox cbDrImgNum = new JComboBox();
+		cbDrImgNum = new JComboBox();
 		cbDrImgNum.setModel(new DefaultComboBoxModel(new String[] { "1", "2",
 				"3", "4" }));
 		pDisseminateReboot.add(cbDrImgNum, "cell 1 0,growx");
@@ -90,6 +93,13 @@ public class MainWindow extends JFrame {
 		tfDrCmd.setColumns(10);
 
 		JButton btnDrExecute = new JButton("Execute");
+		btnDrExecute.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				executeDisseminateReboot();
+			}
+
+		});
 		pDisseminateReboot.add(btnDrExecute, "cell 2 1");
 	}
 
@@ -149,12 +159,57 @@ public class MainWindow extends JFrame {
 				.getSelectedItem());
 		String pathToTosImageXml = tfInstallTosImagePath.getText();
 
-		ProcessResult processResult = tosDelugeExecutor.install(imageNum,
-				pathToTosImageXml);
+		// Execute and display command results
+		displayTosDelugeResults(tosDelugeExecutor.install(imageNum,
+				pathToTosImageXml));
 
+	}
+
+	private void executeDisseminateReboot() {
+
+		// Get parameters
+		int imageNum = Integer.parseInt((String) cbDrImgNum.getSelectedItem());
+
+		// Execute and display command results
+		displayTosDelugeResults(tosDelugeExecutor.disseminateReboot(imageNum));
+	}
+
+	private void executeDisseminateRebootNodes() {
+
+		// Get parameters
+		int imageNum = Integer.parseInt((String) cbDrnImgNum.getSelectedItem());
+
+		int nodeIdsHash = Integer.parseInt(tfDrnNodeIds.getText());
+
+		displayTosDelugeResults(tosDelugeExecutor.disseminateRebootNodes(
+				imageNum, nodeIdsHash));
+
+	}
+
+	private void executeDisseminateRebootGroup() {
+
+		// Get parameters
+		int imageNum = Integer.parseInt((String) cbDrgImgNum.getSelectedItem());
+		int groupId = Integer.parseInt(tfDrgGroupId.getText());
+
+		displayTosDelugeResults(tosDelugeExecutor.disseminateRebootGroup(
+				imageNum, groupId));
+
+	}
+
+	private void executeUpdateNodeGroup() {
+		// Get parameters
+		int nodeIdsHash = Integer.parseInt(tfUngNodeIds.getText());
+		int groupId = Integer.parseInt(tfUngGroupId.getText());
+
+		displayTosDelugeResults(tosDelugeExecutor.updateGroup(nodeIdsHash,
+				groupId));
+
+	}
+
+	private void displayTosDelugeResults(ProcessResult processResult) {
 		taConsole.append(processResult.getCommand().toString());
 		taConsole.append(processResult.toString());
-
 	}
 
 	private void initializeDisseminateRebootNodesPanel(
@@ -165,7 +220,7 @@ public class MainWindow extends JFrame {
 		JLabel lbDrnImgNum = new JLabel("image number:");
 		pDisseminateRebootNodes.add(lbDrnImgNum, "cell 0 0,alignx trailing");
 
-		JComboBox cbDrnImgNum = new JComboBox();
+		cbDrnImgNum = new JComboBox();
 		cbDrnImgNum.setModel(new DefaultComboBoxModel(new String[] { "1", "2",
 				"3", "4" }));
 		pDisseminateRebootNodes.add(cbDrnImgNum, "cell 1 0,growx");
@@ -174,7 +229,7 @@ public class MainWindow extends JFrame {
 		pDisseminateRebootNodes.add(lblDrnNodeIds, "cell 0 1,alignx trailing");
 
 		tfDrnNodeIds = new JTextField();
-		tfDrnNodeIds.setText("hashed value");
+		tfDrnNodeIds.setText("123456");
 		tfDrnNodeIds.setEditable(false);
 		pDisseminateRebootNodes.add(tfDrnNodeIds, "cell 1 1,growx");
 		tfDrnNodeIds.setColumns(10);
@@ -192,6 +247,12 @@ public class MainWindow extends JFrame {
 		tfDrnCmd.setColumns(10);
 
 		JButton btnDrnExecute = new JButton("Execute");
+		btnDrnExecute.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				executeDisseminateRebootNodes();
+			}
+		});
 		pDisseminateRebootNodes.add(btnDrnExecute, "cell 2 2");
 
 	}
@@ -204,7 +265,7 @@ public class MainWindow extends JFrame {
 		JLabel lblDrgImgNum = new JLabel("image number:");
 		pDisseminateRebootGroup.add(lblDrgImgNum, "cell 0 0,alignx trailing");
 
-		JComboBox cbDrgImgNum = new JComboBox();
+		cbDrgImgNum = new JComboBox();
 		cbDrgImgNum.setModel(new DefaultComboBoxModel(new String[] { "1", "2",
 				"3", "4" }));
 		pDisseminateRebootGroup.add(cbDrgImgNum, "cell 1 0,growx");
@@ -227,20 +288,30 @@ public class MainWindow extends JFrame {
 		tfDrgCmd.setColumns(10);
 
 		JButton btnDrgExecute = new JButton("Execute");
+		btnDrgExecute.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				executeDisseminateRebootGroup();
+			}
+		});
 		pDisseminateRebootGroup.add(btnDrgExecute, "cell 2 2");
 
 	}
 
 	private void initializeUpdateGroupPanel(JPanel pUpdateGroup) {
-		pUpdateGroup.setLayout(new MigLayout("", "[][grow][]", "[][][][]"));
-
-		JLabel lblUngImgNum = new JLabel("image number:");
-		pUpdateGroup.add(lblUngImgNum, "cell 0 0,alignx trailing");
-
-		JComboBox cbUngImgNum = new JComboBox();
-		cbUngImgNum.setModel(new DefaultComboBoxModel(new String[] { "1", "2",
-				"3", "4" }));
-		pUpdateGroup.add(cbUngImgNum, "cell 1 0,growx");
+		pUpdateGroup.setLayout(new MigLayout("", "[][grow][]", "[][][]"));
+		
+				JLabel lblUngNodeIds = new JLabel("node IDs:");
+				pUpdateGroup.add(lblUngNodeIds, "cell 0 0,alignx trailing");
+		
+				tfUngNodeIds = new JTextField();
+				tfUngNodeIds.setEditable(false);
+				tfUngNodeIds.setText("123456");
+				pUpdateGroup.add(tfUngNodeIds, "cell 1 0,growx");
+				tfUngNodeIds.setColumns(10);
+		
+				JButton btnUngUpdate = new JButton("Update");
+				pUpdateGroup.add(btnUngUpdate, "cell 2 0");
 
 		JLabel lblUngGroupId = new JLabel("group ID:");
 		pUpdateGroup.add(lblUngGroupId, "cell 0 1,alignx trailing");
@@ -249,30 +320,15 @@ public class MainWindow extends JFrame {
 		tfUngGroupId.setText("1");
 		pUpdateGroup.add(tfUngGroupId, "cell 1 1,growx");
 		tfUngGroupId.setColumns(10);
-
-		JLabel lblUngNodeIds = new JLabel("node IDs:");
-		pUpdateGroup.add(lblUngNodeIds, "cell 0 2,alignx trailing");
-
-		tfUngNodeIds = new JTextField();
-		tfUngNodeIds.setEditable(false);
-		tfUngNodeIds.setText("hashed value");
-		pUpdateGroup.add(tfUngNodeIds, "cell 1 2,growx");
-		tfUngNodeIds.setColumns(10);
-
-		JButton btnUngUpdate = new JButton("Update");
-		pUpdateGroup.add(btnUngUpdate, "cell 2 2");
-
-		JLabel lblUngCmd = new JLabel("command:");
-		pUpdateGroup.add(lblUngCmd, "cell 0 3,alignx trailing");
-
-		tfUngCmd = new JTextField();
-		tfUngCmd.setEditable(false);
-		tfUngCmd.setText("tos-deluge command");
-		pUpdateGroup.add(tfUngCmd, "cell 1 3,growx");
-		tfUngCmd.setColumns(10);
-
-		JButton btnUngExecute = new JButton("Execute");
-		pUpdateGroup.add(btnUngExecute, "cell 2 3");
+		
+				JLabel lblUngCmd = new JLabel("command:");
+				pUpdateGroup.add(lblUngCmd, "cell 0 2,alignx trailing");
+		
+				tfUngCmd = new JTextField();
+				tfUngCmd.setEditable(false);
+				tfUngCmd.setText("tos-deluge command");
+				pUpdateGroup.add(tfUngCmd, "cell 1 2,growx");
+				tfUngCmd.setColumns(10);
 
 	}
 
@@ -388,10 +444,19 @@ public class MainWindow extends JFrame {
 
 		tpCommands.addTab("Update-Group", pUpdateGroup);
 		initializeUpdateGroupPanel(pUpdateGroup);
+		
+				JButton btnUngExecute = new JButton("Execute");
+				btnUngExecute.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+
+						executeUpdateNodeGroup();
+					}
+				});
+				pUpdateGroup.add(btnUngExecute, "cell 2 2");
 
 		taConsole = new JTextArea();
 		initializeTextArea(taConsole);
-		
+
 		JScrollPane spConsole = new JScrollPane();
 		spConsole.setViewportView(taConsole);
 
