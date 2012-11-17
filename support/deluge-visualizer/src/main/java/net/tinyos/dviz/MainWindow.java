@@ -391,9 +391,12 @@ public class MainWindow extends JFrame {
 
 		taConsole = new JTextArea();
 		initializeTextArea(taConsole);
+		
+		JScrollPane spConsole = new JScrollPane();
+		spConsole.setViewportView(taConsole);
 
 		spRoot.setLeftComponent(spChild);
-		spRoot.setRightComponent(taConsole);
+		spRoot.setRightComponent(spConsole);
 
 		JPanel pStatus = new JPanel();
 		initializeStatusPanel(pStatus);
