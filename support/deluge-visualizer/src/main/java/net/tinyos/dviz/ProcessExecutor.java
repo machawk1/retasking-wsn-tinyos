@@ -1,17 +1,13 @@
 package net.tinyos.dviz;
 
-import java.util.Collections;
-
-import java.util.Map;
-
-import net.tinyos.dviz.ProcessExecutor.ProcessResult.Status;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Collections;
+import java.util.Map;
+import net.tinyos.dviz.ProcessExecutor.ProcessResult.Status;
 
 public class ProcessExecutor {
 
@@ -21,12 +17,19 @@ public class ProcessExecutor {
 			Success, Failed, Unknown
 		};
 
+		private ICommand command;
 		private Status status;
 		private String output;
 
-		public ProcessResult(Status status, String output) {
+		public ProcessResult(ICommand command, Status status, String output) {
+
 			this.status = status;
 			this.output = output;
+			this.command = command;
+		}
+
+		public ICommand getCommand() {
+			return command;
 		}
 
 		public Status getStatus() {
@@ -65,7 +68,8 @@ public class ProcessExecutor {
 
 			if (currentEnvVariables.containsKey(entry.getKey()) == false) {
 
-				System.out.println(String.format("(%s) not set, value (%s)", entry.getKey(), entry.getValue()));
+				System.out.println(String.format("(%s) not set, value (%s)",
+						entry.getKey(), entry.getValue()));
 				currentEnvVariables.put(entry.getKey(), entry.getValue());
 			}
 
@@ -73,15 +77,16 @@ public class ProcessExecutor {
 
 	}
 
-	public ProcessResult execute(String[] command, String errorText) {
+	public ProcessResult execute(ICommand command) {
 
-		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		ProcessBuilder processBuilder = new ProcessBuilder(command.getCommand());
 		processBuilder.redirectErrorStream(true);
 		setEnvVariablesOnlyIfTheyDontExist(processBuilder);
 
 		BufferedReader outputFromProcess = null;
 
-		ProcessResult returnValue = new ProcessResult(Status.Unknown, "");
+		ProcessResult returnValue = new ProcessResult(command, Status.Unknown,
+				"");
 
 		try {
 
@@ -100,26 +105,26 @@ public class ProcessExecutor {
 
 			String outputFromCommand = output.toString();
 
-			if (outputFromCommand.contains(errorText)) {
+			if (outputFromCommand.contains(command.getErrorMatchString())) {
 
-				returnValue = new ProcessResult(Status.Failed,
+				returnValue = new ProcessResult(command, Status.Failed,
 						outputFromCommand);
 			} else {
 
-				returnValue = new ProcessResult(Status.Success,
+				returnValue = new ProcessResult(command, Status.Success,
 						outputFromCommand);
 			}
 
 			try {
 				processFromBuilder.waitFor();
 			} catch (InterruptedException e) {
-				returnValue = new ProcessResult(Status.Failed,
+				returnValue = new ProcessResult(command, Status.Failed,
 						"Command interruped before completing!\n"
 								+ outputFromCommand);
 			}
 
 		} catch (IOException e) {
-			returnValue = new ProcessResult(Status.Failed,
+			returnValue = new ProcessResult(command, Status.Failed,
 					"IOException while executing command:\n"
 							+ toStringStackTrace(e));
 		} finally {

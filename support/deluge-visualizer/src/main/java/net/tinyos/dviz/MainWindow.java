@@ -1,5 +1,9 @@
 package net.tinyos.dviz;
 
+import net.tinyos.dviz.ProcessExecutor.ProcessResult;
+
+import java.util.HashMap;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
@@ -25,6 +29,8 @@ import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.table.DefaultTableModel;
 import net.miginfocom.swing.MigLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
@@ -42,12 +48,25 @@ public class MainWindow extends JFrame {
 	private JTextField tfUngNodeIds;
 	private JTextField tfUngCmd;
 
+	private TosDelugeExecutor tosDelugeExecutor;
+	private String source = "serial@/dev/ttyUSB1:57600";
+	private JComboBox cbInstallImgNum;
+	private JTextArea taConsole;
+
 	/**
 	 * Create the application.
 	 */
 	public MainWindow() {
 		setTitle("Deluge Visualizer");
-		initialize();
+		initializeGui();
+		initializeTosDelugeExecutor();
+	}
+
+	private void initializeTosDelugeExecutor() {
+
+		HashMap<String, String> envVariables = new HashMap<String, String>();
+		envVariables.put("TOSROOT", "/opt/retasking-wsn-tinyos");
+		tosDelugeExecutor = new TosDelugeExecutor(source, envVariables);
 	}
 
 	private void initializeDisseminateRebootPanel(JPanel pDisseminateReboot) {
@@ -81,7 +100,7 @@ public class MainWindow extends JFrame {
 		JLabel lblInstallImgNum = new JLabel("image number:");
 		pInstall.add(lblInstallImgNum, "cell 0 0,alignx trailing");
 
-		JComboBox cbInstallImgNum = new JComboBox();
+		cbInstallImgNum = new JComboBox();
 		cbInstallImgNum.setModel(new DefaultComboBoxModel(new String[] { "1",
 				"2", "3", "4" }));
 		pInstall.add(cbInstallImgNum, "flowx,cell 1 0,growx");
@@ -96,6 +115,10 @@ public class MainWindow extends JFrame {
 		tfInstallTosImagePath.setColumns(10);
 
 		JButton btnInstallBrowse = new JButton("Browse");
+		btnInstallBrowse.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		pInstall.add(btnInstallBrowse, "cell 2 1");
 
 		JLabel lblInstallCmd = new JLabel("command:");
@@ -109,7 +132,29 @@ public class MainWindow extends JFrame {
 		tfInstallCmd.setColumns(10);
 
 		JButton btnInstallExecute = new JButton("Execute");
+		btnInstallExecute.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				// TODO: This should be threaded off
+				executeInstall();
+			}
+		});
 		pInstall.add(btnInstallExecute, "cell 2 2");
+	}
+
+	private void executeInstall() {
+
+		// Get parameters
+		int imageNum = Integer.parseInt((String) cbInstallImgNum
+				.getSelectedItem());
+		String pathToTosImageXml = tfInstallTosImagePath.getText();
+
+		ProcessResult processResult = tosDelugeExecutor.install(imageNum,
+				pathToTosImageXml);
+
+		taConsole.append(processResult.getCommand().toString());
+		taConsole.append(processResult.toString());
+
 	}
 
 	private void initializeDisseminateRebootNodesPanel(
@@ -288,7 +333,7 @@ public class MainWindow extends JFrame {
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initializeGui() {
 
 		this.setBounds(100, 100, 722, 560);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -344,7 +389,7 @@ public class MainWindow extends JFrame {
 		tpCommands.addTab("Update-Group", pUpdateGroup);
 		initializeUpdateGroupPanel(pUpdateGroup);
 
-		JTextArea taConsole = new JTextArea();
+		taConsole = new JTextArea();
 		initializeTextArea(taConsole);
 
 		spRoot.setLeftComponent(spChild);
