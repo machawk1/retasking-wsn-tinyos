@@ -1,0 +1,3 @@
+#! /usr/bin/env bash
+
+mvn install:install-file -DgroupId=net.tinyos -DartifactId=tinyos -Dpackaging=jar -Dversion=2.1.2 -Dfile=../sdk/java/tinyos.jar -DgeneratePom=true
