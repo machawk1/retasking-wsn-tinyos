@@ -15,49 +15,44 @@ public class TosDelugeExecutor {
 		this.processExecutor = new ProcessExecutor(envVariables);
 	}
 
-	public ProcessResult install(int imageNum, String pathToTosImageXml) {
+	public ProcessResult install(int imageNum, final String pathToTosImageXml) {
 
-		String[] command = { "tos-deluge", source, "-i",
+		final String[] command = new String[] { "tos-deluge", source, "-i",
 				Integer.toString(imageNum), pathToTosImageXml };
 
-		return processExecutor.execute(command, "ERROR");
-
+		return processExecutor.execute(new DefaultCommand(command, "ERROR"));
 	}
 
 	public ProcessResult disseminateReboot(int imageNum) {
 
-		String[] command = { "tos-deluge", source, "-dr",
+		final String[] command = { "tos-deluge", source, "-dr",
 				Integer.toString(imageNum) };
 
-		return processExecutor.execute(command, "ERROR");
-
+		return processExecutor.execute(new DefaultCommand(command, "ERROR"));
 	}
 
 	public ProcessResult disseminateRebootNodes(int imageNum, int nodeIdsHash) {
 
-		String[] command = { "tos-deluge", source, "-drn",
+		final String[] command = { "tos-deluge", source, "-drn",
 				Integer.toString(imageNum), Integer.toString(nodeIdsHash) };
 
-		return processExecutor.execute(command, "ERROR");
-
+		return processExecutor.execute(new DefaultCommand(command, "ERROR"));
 	}
 
 	public ProcessResult disseminateRebootGroup(int imageNum, int groupId) {
 
-		String[] command = { "tos-deluge", source, "-drg",
+		final String[] command = { "tos-deluge", source, "-drg",
 				Integer.toString(imageNum), Integer.toString(groupId) };
 
-		return processExecutor.execute(command, "ERROR");
-
+		return processExecutor.execute(new DefaultCommand(command, "ERROR"));
 	}
 
 	public ProcessResult updateGroup(int nodeIdsHash, int groupId) {
 
-		String[] command = { "tos-deluge", source, "-ung",
+		final String[] command = { "tos-deluge", source, "-ung",
 				Integer.toString(nodeIdsHash), Integer.toString(groupId) };
 
-		return processExecutor.execute(command, "ERROR");
-
+		return processExecutor.execute(new DefaultCommand(command, "ERROR"));
 	}
 
 }
