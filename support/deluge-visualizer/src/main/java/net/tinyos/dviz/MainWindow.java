@@ -1,5 +1,10 @@
 package net.tinyos.dviz;
 
+import java.io.File;
+import javax.swing.filechooser.FileFilter;
+import java.io.File;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.JFileChooser;
 import net.tinyos.dviz.MoteMessageService.State;
 import net.tinyos.dviz.MoteMessageService.ServiceStatus;
 import net.tinyos.dviz.SettingsDialog.DialogResult;
@@ -151,6 +156,7 @@ public class MainWindow extends JFrame {
         btnInstallBrowse.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                openFileChooserForTosImagePath();
             }
         });
         pInstall.add(btnInstallBrowse, "cell 2 1");
@@ -175,6 +181,30 @@ public class MainWindow extends JFrame {
             }
         });
         pInstall.add(btnInstallExecute, "cell 2 2");
+    }
+
+    private void openFileChooserForTosImagePath() {
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileFilter() {
+
+            @Override
+            public String getDescription() {
+                return "tos_image.xml";
+            }
+
+            @Override
+            public boolean accept(File f) {
+
+                return f.getName().equals("tos_image.xml");
+            }
+        });
+
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+
+            tfInstallTosImagePath.setText(fileChooser.getSelectedFile().getAbsolutePath());
+        }
+
     }
 
     private void startMoteMessageService() {
