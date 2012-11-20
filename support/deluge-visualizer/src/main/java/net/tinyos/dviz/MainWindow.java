@@ -1,5 +1,9 @@
 package net.tinyos.dviz;
 
+import net.tinyos.dviz.MoteMessageService.MessageSubscriber;
+
+import java.util.ArrayList;
+
 import net.tinyos.dviz.ProcessExecutor.ProcessResult;
 
 import java.util.HashMap;
@@ -48,13 +52,16 @@ public class MainWindow extends JFrame {
 	private JTextField tfUngNodeIds;
 	private JTextField tfUngCmd;
 
-	private TosDelugeExecutor tosDelugeExecutor;
-	private String source = "serial@/dev/ttyUSB1:57600";
 	private JComboBox cbInstallImgNum;
 	private JTextArea taConsole;
 	private JComboBox cbDrnImgNum;
 	private JComboBox cbDrImgNum;
 	private JComboBox cbDrgImgNum;
+
+	private TosDelugeExecutor tosDelugeExecutor;
+	private MoteMessageService moteMessageService;
+	private String source = "serial@/dev/ttyUSB1:57600";
+	private JButton btnConnection;
 
 	/**
 	 * Create the application.
@@ -63,6 +70,7 @@ public class MainWindow extends JFrame {
 		setTitle("Deluge Visualizer");
 		initializeGui();
 		initializeTosDelugeExecutor();
+		initializeMoteMessageService();
 	}
 
 	private void initializeTosDelugeExecutor() {
@@ -70,6 +78,16 @@ public class MainWindow extends JFrame {
 		HashMap<String, String> envVariables = new HashMap<String, String>();
 		envVariables.put("TOSROOT", "/opt/retasking-wsn-tinyos");
 		tosDelugeExecutor = new TosDelugeExecutor(source, envVariables);
+	}
+
+	private void initializeMoteMessageService() {
+
+		ArrayList<MessageSubscriber> subscribers = new ArrayList<MessageSubscriber>();
+
+		// TODO: Fix null
+		subscribers.add(new MessageSubscriber(null, null));
+		moteMessageService = new MoteMessageService(subscribers);
+
 	}
 
 	private void initializeDisseminateRebootPanel(JPanel pDisseminateReboot) {
@@ -150,6 +168,15 @@ public class MainWindow extends JFrame {
 			}
 		});
 		pInstall.add(btnInstallExecute, "cell 2 2");
+	}
+
+	private void startMoteMessageService() {
+
+		// TODO: Fix null and return status of service
+		moteMessageService.start(null);
+
+		// TODO: Update button color based on the status
+		btnConnection.setBackground(Color.GREEN);
 	}
 
 	private void executeInstall() {
@@ -300,18 +327,18 @@ public class MainWindow extends JFrame {
 
 	private void initializeUpdateGroupPanel(JPanel pUpdateGroup) {
 		pUpdateGroup.setLayout(new MigLayout("", "[][grow][]", "[][][]"));
-		
-				JLabel lblUngNodeIds = new JLabel("node IDs:");
-				pUpdateGroup.add(lblUngNodeIds, "cell 0 0,alignx trailing");
-		
-				tfUngNodeIds = new JTextField();
-				tfUngNodeIds.setEditable(false);
-				tfUngNodeIds.setText("123456");
-				pUpdateGroup.add(tfUngNodeIds, "cell 1 0,growx");
-				tfUngNodeIds.setColumns(10);
-		
-				JButton btnUngUpdate = new JButton("Update");
-				pUpdateGroup.add(btnUngUpdate, "cell 2 0");
+
+		JLabel lblUngNodeIds = new JLabel("node IDs:");
+		pUpdateGroup.add(lblUngNodeIds, "cell 0 0,alignx trailing");
+
+		tfUngNodeIds = new JTextField();
+		tfUngNodeIds.setEditable(false);
+		tfUngNodeIds.setText("123456");
+		pUpdateGroup.add(tfUngNodeIds, "cell 1 0,growx");
+		tfUngNodeIds.setColumns(10);
+
+		JButton btnUngUpdate = new JButton("Update");
+		pUpdateGroup.add(btnUngUpdate, "cell 2 0");
 
 		JLabel lblUngGroupId = new JLabel("group ID:");
 		pUpdateGroup.add(lblUngGroupId, "cell 0 1,alignx trailing");
@@ -320,15 +347,15 @@ public class MainWindow extends JFrame {
 		tfUngGroupId.setText("1");
 		pUpdateGroup.add(tfUngGroupId, "cell 1 1,growx");
 		tfUngGroupId.setColumns(10);
-		
-				JLabel lblUngCmd = new JLabel("command:");
-				pUpdateGroup.add(lblUngCmd, "cell 0 2,alignx trailing");
-		
-				tfUngCmd = new JTextField();
-				tfUngCmd.setEditable(false);
-				tfUngCmd.setText("tos-deluge command");
-				pUpdateGroup.add(tfUngCmd, "cell 1 2,growx");
-				tfUngCmd.setColumns(10);
+
+		JLabel lblUngCmd = new JLabel("command:");
+		pUpdateGroup.add(lblUngCmd, "cell 0 2,alignx trailing");
+
+		tfUngCmd = new JTextField();
+		tfUngCmd.setEditable(false);
+		tfUngCmd.setText("tos-deluge command");
+		pUpdateGroup.add(tfUngCmd, "cell 1 2,growx");
+		tfUngCmd.setColumns(10);
 
 	}
 
@@ -381,7 +408,13 @@ public class MainWindow extends JFrame {
 		pStatus.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		pStatus.setLayout(new BoxLayout(pStatus, BoxLayout.LINE_AXIS));
 
-		JButton btnConnection = new JButton("Disconnected");
+		btnConnection = new JButton("Disconnected");
+		btnConnection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				startMoteMessageService();
+			}
+		});
 		btnConnection.setBackground(Color.RED);
 		pStatus.add(btnConnection);
 	}
@@ -444,15 +477,15 @@ public class MainWindow extends JFrame {
 
 		tpCommands.addTab("Update-Group", pUpdateGroup);
 		initializeUpdateGroupPanel(pUpdateGroup);
-		
-				JButton btnUngExecute = new JButton("Execute");
-				btnUngExecute.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
 
-						executeUpdateNodeGroup();
-					}
-				});
-				pUpdateGroup.add(btnUngExecute, "cell 2 2");
+		JButton btnUngExecute = new JButton("Execute");
+		btnUngExecute.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				executeUpdateNodeGroup();
+			}
+		});
+		pUpdateGroup.add(btnUngExecute, "cell 2 2");
 
 		taConsole = new JTextArea();
 		initializeTextArea(taConsole);

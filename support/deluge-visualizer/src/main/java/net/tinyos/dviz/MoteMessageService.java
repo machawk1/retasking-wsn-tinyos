@@ -14,7 +14,7 @@ public class MoteMessageService {
 		Stopped, Running
 	};
 
-	public static class MessageSubscirber {
+	public static class MessageSubscriber {
 
 		private MessageListener messageListener;
 		private Message messageType;
@@ -27,7 +27,7 @@ public class MoteMessageService {
 			return messageType;
 		}
 
-		public MessageSubscirber(Message messageType,
+		public MessageSubscriber(Message messageType,
 				MessageListener messageListener) {
 			this.messageType = messageType;
 			this.messageListener = messageListener;
@@ -37,9 +37,9 @@ public class MoteMessageService {
 	private MoteIF moteIF;
 	private PhoenixSource phoenixSource;
 	private State status = State.Stopped;
-	private List<MessageSubscirber> subscribers;
+	private List<MessageSubscriber> subscribers;
 
-	public MoteMessageService(List<MessageSubscirber> subscribers) {
+	public MoteMessageService(List<MessageSubscriber> subscribers) {
 
 		this.subscribers = subscribers;
 	}
@@ -60,7 +60,7 @@ public class MoteMessageService {
 
 	private void registerAllSubscribers() {
 
-		for (MessageSubscirber subscriber : subscribers) {
+		for (MessageSubscriber subscriber : subscribers) {
 
 			moteIF.registerListener(subscriber.getMessageType(),
 					subscriber.getMessageListener());
@@ -83,7 +83,7 @@ public class MoteMessageService {
 
 	private void deregisterAllSubscribers() {
 
-		for (MessageSubscirber subscriber : subscribers) {
+		for (MessageSubscriber subscriber : subscribers) {
 
 			moteIF.deregisterListener(subscriber.getMessageType(),
 					subscriber.getMessageListener());
