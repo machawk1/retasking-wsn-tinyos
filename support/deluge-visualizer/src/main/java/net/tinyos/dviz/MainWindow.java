@@ -183,6 +183,28 @@ public class MainWindow extends JFrame {
         pInstall.add(btnInstallExecute, "cell 2 2");
     }
 
+    private void drnUpdateNodeIdsHash() {
+
+        int nodeIds = 0;
+
+        nodeIds = nodeIds | (1 << 0);
+        nodeIds = nodeIds | (1 << 1);
+        nodeIds = nodeIds | (1 << 2);
+
+        tfDrnNodeIds.setText(Integer.toString(nodeIds));
+    }
+
+    private void ungUpdateNodeIdsHash() {
+
+        int nodeIds = 0;
+
+        nodeIds = nodeIds | (1 << 0);
+        nodeIds = nodeIds | (1 << 1);
+        nodeIds = nodeIds | (1 << 2);
+
+        tfUngNodeIds.setText(Integer.toString(nodeIds));
+    }
+
     private void openFileChooserForTosImagePath() {
 
         JFileChooser fileChooser = new JFileChooser();
@@ -195,6 +217,10 @@ public class MainWindow extends JFrame {
 
             @Override
             public boolean accept(File f) {
+
+                if (f.isDirectory()) {
+                    return true;
+                }
 
                 return f.getName().equals("tos_image.xml");
             }
@@ -305,6 +331,11 @@ public class MainWindow extends JFrame {
         tfDrnNodeIds.setColumns(10);
 
         JButton btnDrnUpdate = new JButton("Update");
+        btnDrnUpdate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                drnUpdateNodeIdsHash();
+            }
+        });
         pDisseminateRebootNodes.add(btnDrnUpdate, "cell 2 1");
 
         JLabel lblDrnCmd = new JLabel("command:");
@@ -380,6 +411,12 @@ public class MainWindow extends JFrame {
         tfUngNodeIds.setColumns(10);
 
         JButton btnUngUpdate = new JButton("Update");
+        btnUngUpdate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                ungUpdateNodeIdsHash();
+            }
+        });
         pUpdateGroup.add(btnUngUpdate, "cell 2 0");
 
         JLabel lblUngGroupId = new JLabel("group ID:");
