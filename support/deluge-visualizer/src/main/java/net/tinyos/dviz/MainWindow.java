@@ -1,5 +1,8 @@
 package net.tinyos.dviz;
 
+import net.tinyos.dviz.MoteMessageService.State;
+import net.tinyos.dviz.MoteMessageService.ServiceStatus;
+import net.tinyos.dviz.SettingsDialog.DialogResult;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
@@ -55,9 +58,9 @@ public class MainWindow extends JFrame {
     private JComboBox cbDrImgNum;
     private JComboBox cbDrgImgNum;
 
+    private SettingsDialog settingsDialog;
     private TosDelugeExecutor tosDelugeExecutor;
     private MoteMessageService moteMessageService;
-    private String source = "serial@/dev/ttyUSB1:57600";
     private JButton btnConnection;
 
     /**
@@ -66,15 +69,21 @@ public class MainWindow extends JFrame {
     public MainWindow() {
         setTitle("Deluge Visualizer");
         initializeGui();
+        initializeSettingsDialog();
         initializeTosDelugeExecutor();
         initializeMoteMessageService();
+    }
+
+    private void initializeSettingsDialog() {
+
+        settingsDialog = new SettingsDialog("serial@/dev/ttyUSB1:57600");
     }
 
     private void initializeTosDelugeExecutor() {
 
         HashMap<String, String> envVariables = new HashMap<String, String>();
         envVariables.put("TOSROOT", "/opt/retasking-wsn-tinyos");
-        tosDelugeExecutor = new TosDelugeExecutor(source, envVariables);
+        tosDelugeExecutor = new TosDelugeExecutor(settingsDialog.getSource(), envVariables);
     }
 
     private void initializeMoteMessageService() {
@@ -170,11 +179,18 @@ public class MainWindow extends JFrame {
 
     private void startMoteMessageService() {
 
-        // TODO: Fix null and return status of service
-        moteMessageService.start(null);
+        ServiceStatus serviceStatus = moteMessageService.start(settingsDialog.getSource());
 
-        // TODO: Update button color based on the status
-        btnConnection.setBackground(Color.GREEN);
+        if (serviceStatus.getStatus() == State.Running) {
+
+            btnConnection.setBackground(Color.GREEN);
+            btnConnection.setText("Connected");
+        } else {
+
+            btnConnection.setBackground(Color.RED);
+            btnConnection.setText("Disconnected");
+            displayMoteMessageServiceStatusError(serviceStatus);
+        }
     }
 
     private void executeInstall() {
@@ -230,6 +246,13 @@ public class MainWindow extends JFrame {
     private void displayTosDelugeResults(ProcessResult processResult) {
         taConsole.append(processResult.getCommand().toString());
         taConsole.append(processResult.toString());
+    }
+
+    private void displayMoteMessageServiceStatusError(ServiceStatus serviceStatus) {
+
+        taConsole.append(String.format("Attempted to start the MoteMessageService (Source=\"%s\") but captured the following error:\n",
+                serviceStatus.getSource()));
+        taConsole.append(serviceStatus.getErrorText());
     }
 
     private void initializeDisseminateRebootNodesPanel(JPanel pDisseminateRebootNodes) {
@@ -360,9 +383,11 @@ public class MainWindow extends JFrame {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                SettingsDialog settingsDialog = new SettingsDialog();
-                settingsDialog.display();
 
+                if (settingsDialog.display() == DialogResult.OK) {
+
+                    tosDelugeExecutor.setSource(settingsDialog.getSource());
+                }
             }
         });
         mnFile.add(mntmSettings);

@@ -8,6 +8,15 @@ public class TosDelugeExecutor {
     private String source;
     private ProcessExecutor processExecutor;
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+
+        this.source = source;
+    }
+
     public TosDelugeExecutor(String source, Map<String, String> envVariables) {
 
         this.source = source;

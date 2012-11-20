@@ -17,13 +17,26 @@ import net.miginfocom.swing.MigLayout;
 @SuppressWarnings("serial")
 public class SettingsDialog extends JDialog {
 
+    public enum DialogResult {
+        OK, Cancel
+    };
+
+    private DialogResult result = DialogResult.Cancel;
     private final JPanel contentPanel = new JPanel();
     private JTextField tfSource;
+
+    private String source;
+
+    public String getSource() {
+        return source;
+    }
 
     /**
      * Create the dialog.
      */
-    public SettingsDialog() {
+    public SettingsDialog(String defaultSource) {
+        this.source = defaultSource;
+
         setTitle("Settings");
         setBounds(100, 100, 450, 105);
         getContentPane().setLayout(new BorderLayout());
@@ -36,7 +49,7 @@ public class SettingsDialog extends JDialog {
         }
         {
             tfSource = new JTextField();
-            tfSource.setText("serial@/dev/ttyUSB1:57600");
+            tfSource.setText(source);
             contentPanel.add(tfSource, "cell 1 0,growx");
             tfSource.setColumns(10);
         }
@@ -50,6 +63,8 @@ public class SettingsDialog extends JDialog {
                     @Override
                     public void actionPerformed(ActionEvent e) {
 
+                        source = tfSource.getText();
+                        result = DialogResult.OK;
                         SettingsDialog.this.close();
                     }
                 });
@@ -63,6 +78,8 @@ public class SettingsDialog extends JDialog {
                     @Override
                     public void actionPerformed(ActionEvent e) {
 
+                        tfSource.setText(source);
+                        result = DialogResult.Cancel;
                         SettingsDialog.this.close();
                     }
                 });
@@ -72,12 +89,14 @@ public class SettingsDialog extends JDialog {
         }
     }
 
-    public void display() {
+    public DialogResult display() {
 
         this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.setModal(true);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+
+        return result;
     }
 
     public void close() {

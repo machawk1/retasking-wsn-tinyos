@@ -3,8 +3,6 @@ package net.tinyos.dviz;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Map;
 import net.tinyos.dviz.ProcessExecutor.ProcessResult.Status;
@@ -116,7 +114,7 @@ public class ProcessExecutor {
             }
 
         } catch (IOException e) {
-            returnValue = new ProcessResult(command, Status.Failed, "IOException while executing command:\n" + toStringStackTrace(e));
+            returnValue = new ProcessResult(command, Status.Failed, "IOException while executing command:\n" + Utilities.toStringStackTrace(e));
         } finally {
             close(outputFromProcess);
         }
@@ -134,14 +132,6 @@ public class ProcessExecutor {
 
             System.err.println("IOException when closing the buffered reader");
         }
-    }
-
-    private String toStringStackTrace(Throwable e) {
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        return sw.toString();
     }
 
 }
