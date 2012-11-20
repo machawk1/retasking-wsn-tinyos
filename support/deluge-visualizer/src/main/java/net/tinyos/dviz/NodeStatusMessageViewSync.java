@@ -7,33 +7,34 @@ import net.tinyos.message.MessageListener;
 
 public class NodeStatusMessageViewSync implements MessageListener {
 
-	private DefaultTableModel nodeStatusModel;
+    private DefaultTableModel nodeStatusModel;
 
-	public NodeStatusMessageViewSync(DefaultTableModel nodeStatusModel) {
+    public NodeStatusMessageViewSync(DefaultTableModel nodeStatusModel) {
 
-		this.nodeStatusModel = nodeStatusModel;
-	}
+        this.nodeStatusModel = nodeStatusModel;
+    }
 
-	@Override
-	public void messageReceived(int to, Message message) {
+    @Override
+    public void messageReceived(int to, Message message) {
 
-		// Update the Table Model
-		updateTable(message);
-	}
+        // Update the Table Model
+        updateTable(message);
+    }
 
-	private void updateTable(Message message) {
+    private void updateTable(Message message) {
 
-		Runnable doWorkRunnable = new Runnable() {
+        Runnable doWorkRunnable = new Runnable() {
 
-			public void run() {
+            @Override
+            public void run() {
 
-				// TODO: Add code to update table
-				nodeStatusModel.getDataVector();
-			}
+                // TODO: Add code to update table
+                nodeStatusModel.getDataVector();
+            }
 
-		};
+        };
 
-		SwingUtilities.invokeLater(doWorkRunnable);
-	}
+        SwingUtilities.invokeLater(doWorkRunnable);
+    }
 
 }

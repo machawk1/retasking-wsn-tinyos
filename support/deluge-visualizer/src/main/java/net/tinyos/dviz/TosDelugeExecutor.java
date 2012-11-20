@@ -1,58 +1,52 @@
 package net.tinyos.dviz;
 
 import java.util.Map;
-
 import net.tinyos.dviz.ProcessExecutor.ProcessResult;
 
 public class TosDelugeExecutor {
 
-	private String source;
-	private ProcessExecutor processExecutor;
+    private String source;
+    private ProcessExecutor processExecutor;
 
-	public TosDelugeExecutor(String source, Map<String, String> envVariables) {
+    public TosDelugeExecutor(String source, Map<String, String> envVariables) {
 
-		this.source = source;
-		this.processExecutor = new ProcessExecutor(envVariables);
-	}
+        this.source = source;
+        this.processExecutor = new ProcessExecutor(envVariables);
+    }
 
-	public ProcessResult install(int imageNum, final String pathToTosImageXml) {
+    public ProcessResult install(int imageNum, final String pathToTosImageXml) {
 
-		final String[] command = new String[] { "tos-deluge", source, "-i",
-				Integer.toString(imageNum), pathToTosImageXml };
+        final String[] command = new String[] {"tos-deluge", source, "-i", Integer.toString(imageNum), pathToTosImageXml};
 
-		return processExecutor.execute(new DefaultCommand(command, "ERROR"));
-	}
+        return processExecutor.execute(new DefaultCommand(command, "ERROR"));
+    }
 
-	public ProcessResult disseminateReboot(int imageNum) {
+    public ProcessResult disseminateReboot(int imageNum) {
 
-		final String[] command = { "tos-deluge", source, "-dr",
-				Integer.toString(imageNum) };
+        final String[] command = {"tos-deluge", source, "-dr", Integer.toString(imageNum)};
 
-		return processExecutor.execute(new DefaultCommand(command, "ERROR"));
-	}
+        return processExecutor.execute(new DefaultCommand(command, "ERROR"));
+    }
 
-	public ProcessResult disseminateRebootNodes(int imageNum, int nodeIdsHash) {
+    public ProcessResult disseminateRebootNodes(int imageNum, int nodeIdsHash) {
 
-		final String[] command = { "tos-deluge", source, "-drn",
-				Integer.toString(imageNum), Integer.toString(nodeIdsHash) };
+        final String[] command = {"tos-deluge", source, "-drn", Integer.toString(imageNum), Integer.toString(nodeIdsHash)};
 
-		return processExecutor.execute(new DefaultCommand(command, "ERROR"));
-	}
+        return processExecutor.execute(new DefaultCommand(command, "ERROR"));
+    }
 
-	public ProcessResult disseminateRebootGroup(int imageNum, int groupId) {
+    public ProcessResult disseminateRebootGroup(int imageNum, int groupId) {
 
-		final String[] command = { "tos-deluge", source, "-drg",
-				Integer.toString(imageNum), Integer.toString(groupId) };
+        final String[] command = {"tos-deluge", source, "-drg", Integer.toString(imageNum), Integer.toString(groupId)};
 
-		return processExecutor.execute(new DefaultCommand(command, "ERROR"));
-	}
+        return processExecutor.execute(new DefaultCommand(command, "ERROR"));
+    }
 
-	public ProcessResult updateGroup(int nodeIdsHash, int groupId) {
+    public ProcessResult updateGroup(int nodeIdsHash, int groupId) {
 
-		final String[] command = { "tos-deluge", source, "-ung",
-				Integer.toString(nodeIdsHash), Integer.toString(groupId) };
+        final String[] command = {"tos-deluge", source, "-ung", Integer.toString(nodeIdsHash), Integer.toString(groupId)};
 
-		return processExecutor.execute(new DefaultCommand(command, "ERROR"));
-	}
+        return processExecutor.execute(new DefaultCommand(command, "ERROR"));
+    }
 
 }

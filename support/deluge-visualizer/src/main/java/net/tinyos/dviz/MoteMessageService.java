@@ -10,84 +10,80 @@ import net.tinyos.util.PrintStreamMessenger;
 
 public class MoteMessageService {
 
-	public enum State {
-		Stopped, Running
-	};
+    public enum State {
+        Stopped, Running
+    };
 
-	public static class MessageSubscriber {
+    public static class MessageSubscriber {
 
-		private MessageListener messageListener;
-		private Message messageType;
+        private MessageListener messageListener;
+        private Message messageType;
 
-		public MessageListener getMessageListener() {
-			return messageListener;
-		}
+        public MessageListener getMessageListener() {
+            return messageListener;
+        }
 
-		public Message getMessageType() {
-			return messageType;
-		}
+        public Message getMessageType() {
+            return messageType;
+        }
 
-		public MessageSubscriber(Message messageType,
-				MessageListener messageListener) {
-			this.messageType = messageType;
-			this.messageListener = messageListener;
-		}
-	}
+        public MessageSubscriber(Message messageType, MessageListener messageListener) {
+            this.messageType = messageType;
+            this.messageListener = messageListener;
+        }
+    }
 
-	private MoteIF moteIF;
-	private PhoenixSource phoenixSource;
-	private State status = State.Stopped;
-	private List<MessageSubscriber> subscribers;
+    private MoteIF moteIF;
+    private PhoenixSource phoenixSource;
+    private State status = State.Stopped;
+    private List<MessageSubscriber> subscribers;
 
-	public MoteMessageService(List<MessageSubscriber> subscribers) {
+    public MoteMessageService(List<MessageSubscriber> subscribers) {
 
-		this.subscribers = subscribers;
-	}
+        this.subscribers = subscribers;
+    }
 
-	public void start(String source) {
+    public void start(String source) {
 
-		if (status != State.Running) {
-			phoenixSource = BuildSource.makePhoenix(source,
-					PrintStreamMessenger.err);
+        if (status != State.Running) {
+            phoenixSource = BuildSource.makePhoenix(source, PrintStreamMessenger.err);
 
-			moteIF = new MoteIF(phoenixSource);
+            moteIF = new MoteIF(phoenixSource);
 
-			registerAllSubscribers();
+            registerAllSubscribers();
 
-			status = State.Running;
-		}
-	}
+            status = State.Running;
+        }
+    }
 
-	private void registerAllSubscribers() {
+    private void registerAllSubscribers() {
 
-		for (MessageSubscriber subscriber : subscribers) {
+        for (MessageSubscriber subscriber : subscribers) {
 
-			moteIF.registerListener(subscriber.getMessageType(),
-					subscriber.getMessageListener());
-		}
-	}
+            moteIF.registerListener(subscriber.getMessageType(), subscriber.getMessageListener());
+        }
+    }
 
-	public void stop() {
+    public void stop() {
 
-		if (status != State.Stopped) {
+        if (status != State.Stopped) {
 
-			deregisterAllSubscribers();
+            deregisterAllSubscribers();
 
-			// Shutdown the phoneix source
-			phoenixSource.shutdown();
+            // Shutdown the phoneix source
+            phoenixSource.shutdown();
 
-			status = State.Stopped;
-		}
+            status = State.Stopped;
+        }
 
-	}
+    }
 
-	private void deregisterAllSubscribers() {
+    private void deregisterAllSubscribers() {
 
-		for (MessageSubscriber subscriber : subscribers) {
+        for (MessageSubscriber subscriber : subscribers) {
 
-			moteIF.deregisterListener(subscriber.getMessageType(),
-					subscriber.getMessageListener());
-		}
+            moteIF.deregisterListener(subscriber.getMessageType(), subscriber.getMessageListener());
+        }
 
-	}
+    }
 }

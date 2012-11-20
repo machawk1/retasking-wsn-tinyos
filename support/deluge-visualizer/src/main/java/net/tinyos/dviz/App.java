@@ -9,34 +9,35 @@ import javax.swing.UnsupportedLookAndFeelException;
  * 
  */
 public class App {
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		setWindowsLookAndFeel();
+        setWindowsLookAndFeel();
 
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainWindow window = new MainWindow();
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    MainWindow window = new MainWindow();
+                    window.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
-	private static void setWindowsLookAndFeel() {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (InstantiationException e1) {
-			e1.printStackTrace();
-		} catch (IllegalAccessException e1) {
-			e1.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e1) {
-			e1.printStackTrace();
-		}
+    private static void setWindowsLookAndFeel() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException e1) {
+            e1.printStackTrace();
+        } catch (InstantiationException e1) {
+            e1.printStackTrace();
+        } catch (IllegalAccessException e1) {
+            e1.printStackTrace();
+        } catch (UnsupportedLookAndFeelException e1) {
+            e1.printStackTrace();
+        }
 
-	}
+    }
 }
