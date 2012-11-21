@@ -31,6 +31,8 @@ public class NodeIdsHashCreator extends JDialog {
 	 * Create the dialog.
 	 */
 	public NodeIdsHashCreator() {
+		setResizable(false);
+		setTitle("Node IDs Hash Creator");
 		setBounds(100, 100, 493, 182);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -328,10 +330,9 @@ public class NodeIdsHashCreator extends JDialog {
 		{
 			JPanel buttonPane = new JPanel();
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
-			buttonPane.setLayout(new MigLayout("",
-					"[][118.00][][][][][][][][]", "[]"));
+			buttonPane.setLayout(new MigLayout("", "[][118.00][146.00][][]", "[]"));
 			{
-				JLabel lblNodeIdsHash = new JLabel("NodeIds Hash:");
+				JLabel lblNodeIdsHash = new JLabel("node IDs hash:");
 				buttonPane.add(lblNodeIdsHash,
 						"cell 0 0,alignx left,aligny center");
 			}
@@ -351,7 +352,7 @@ public class NodeIdsHashCreator extends JDialog {
 					}
 				});
 				okButton.setActionCommand("OK");
-				buttonPane.add(okButton, "cell 8 0,alignx center,aligny top");
+				buttonPane.add(okButton, "cell 3 0,alignx center,aligny top");
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
@@ -365,7 +366,7 @@ public class NodeIdsHashCreator extends JDialog {
 				});
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton,
-						"cell 9 0,alignx left,aligny center");
+						"cell 4 0,alignx left,aligny center");
 			}
 		}
 	}

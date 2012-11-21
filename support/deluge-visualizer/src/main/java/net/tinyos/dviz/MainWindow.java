@@ -284,7 +284,7 @@ public class MainWindow extends JFrame {
 		// Get parameters
 		int imageNum = Integer.parseInt((String) cbDrnImgNum.getSelectedItem());
 
-		int nodeIdsHash = Integer.parseInt(tfDrnNodeIds.getText());
+		long nodeIdsHash = Long.parseLong(tfDrnNodeIds.getText());
 
 		displayTosDelugeResults(tosDelugeExecutor.disseminateRebootNodes(
 				imageNum, nodeIdsHash));
@@ -304,7 +304,7 @@ public class MainWindow extends JFrame {
 
 	private void executeUpdateNodeGroup() {
 		// Get parameters
-		int nodeIdsHash = Integer.parseInt(tfUngNodeIds.getText());
+		long nodeIdsHash = Long.parseLong(tfUngNodeIds.getText());
 		int groupId = Integer.parseInt(tfUngGroupId.getText());
 
 		displayTosDelugeResults(tosDelugeExecutor.updateGroup(nodeIdsHash,
@@ -341,7 +341,7 @@ public class MainWindow extends JFrame {
 				"3", "4" }));
 		pDisseminateRebootNodes.add(cbDrnImgNum, "cell 1 0,growx");
 
-		JLabel lblDrnNodeIds = new JLabel("node IDs:");
+		JLabel lblDrnNodeIds = new JLabel("node IDs hash:");
 		pDisseminateRebootNodes.add(lblDrnNodeIds, "cell 0 1,alignx trailing");
 
 		tfDrnNodeIds = new JTextField();
@@ -424,7 +424,7 @@ public class MainWindow extends JFrame {
 	private void initializeUpdateGroupPanel(JPanel pUpdateGroup) {
 		pUpdateGroup.setLayout(new MigLayout("", "[][grow][]", "[][][]"));
 
-		JLabel lblUngNodeIds = new JLabel("node IDs:");
+		JLabel lblUngNodeIds = new JLabel("node IDs hash:");
 		pUpdateGroup.add(lblUngNodeIds, "cell 0 0,alignx trailing");
 
 		tfUngNodeIds = new JTextField();
@@ -504,7 +504,8 @@ public class MainWindow extends JFrame {
 	private void initializeTextArea(JTextArea taConsole) {
 
 		taConsole.setEditable(false);
-		taConsole.addMouseListener(new ConsoleMouseAdapter(new ConsoleContextMenu(taConsole)));
+		taConsole.addMouseListener(new ConsoleMouseAdapter(
+				new ConsoleContextMenu(taConsole)));
 	}
 
 	private void initializeStatusPanel(JPanel pStatus) {

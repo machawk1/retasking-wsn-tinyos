@@ -37,9 +37,9 @@ public class TosDelugeExecutor {
         return processExecutor.execute(new DefaultCommand(command, "ERROR"));
     }
 
-    public ProcessResult disseminateRebootNodes(int imageNum, int nodeIdsHash) {
+    public ProcessResult disseminateRebootNodes(int imageNum, long nodeIdsHash) {
 
-        final String[] command = {"tos-deluge", source, "-drn", Integer.toString(imageNum), Integer.toString(nodeIdsHash)};
+        final String[] command = {"tos-deluge", source, "-drn", Integer.toString(imageNum), Long.toString(nodeIdsHash)};
 
         return processExecutor.execute(new DefaultCommand(command, "ERROR"));
     }
@@ -51,9 +51,9 @@ public class TosDelugeExecutor {
         return processExecutor.execute(new DefaultCommand(command, "ERROR"));
     }
 
-    public ProcessResult updateGroup(int nodeIdsHash, int groupId) {
+    public ProcessResult updateGroup(long nodeIdsHash, int groupId) {
 
-        final String[] command = {"tos-deluge", source, "-ung", Integer.toString(nodeIdsHash), Integer.toString(groupId)};
+        final String[] command = {"tos-deluge", source, "-ung", Long.toString(nodeIdsHash), Integer.toString(groupId)};
 
         return processExecutor.execute(new DefaultCommand(command, "ERROR"));
     }
