@@ -313,7 +313,8 @@ public class MainWindow extends JFrame {
 	}
 
 	private void displayTosDelugeResults(ProcessResult processResult) {
-		taConsole.append(processResult.getCommand().toString());
+
+		taConsole.append(processResult.getCommand().toString() + "\n");
 		taConsole.append(processResult.toString());
 	}
 
@@ -503,6 +504,7 @@ public class MainWindow extends JFrame {
 	private void initializeTextArea(JTextArea taConsole) {
 
 		taConsole.setEditable(false);
+		taConsole.addMouseListener(new ConsoleMouseAdapter(new ConsoleContextMenu(taConsole)));
 	}
 
 	private void initializeStatusPanel(JPanel pStatus) {

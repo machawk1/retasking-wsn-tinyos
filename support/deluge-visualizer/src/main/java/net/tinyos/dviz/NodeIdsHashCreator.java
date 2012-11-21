@@ -372,8 +372,8 @@ public class NodeIdsHashCreator extends JDialog {
 
 	private void checkBoxUpdated(JCheckBox checkBox) {
 
-//		System.out.println(String.format("CheckBox Num:(%s) Value:%b",
-//				checkBox.getText(), checkBox.isSelected()));
+		// System.out.println(String.format("CheckBox Num:(%s) Value:%b",
+		// checkBox.getText(), checkBox.isSelected()));
 
 		boolean setBit = checkBox.isSelected();
 		long bit = Long.parseLong(checkBox.getText());
