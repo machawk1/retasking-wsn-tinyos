@@ -33,6 +33,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 import net.miginfocom.swing.MigLayout;
+import net.tinyos.dviz.GroupIdTextFieldDocListener.GroupIdChangedListener;
 import net.tinyos.dviz.MoteMessageService.MessageSubscriber;
 import net.tinyos.dviz.MoteMessageService.ServiceStatus;
 import net.tinyos.dviz.MoteMessageService.State;
@@ -60,12 +61,15 @@ public class MainWindow extends JFrame {
     private JComboBox cbDrnImgNum;
     private JComboBox cbDrImgNum;
     private JComboBox cbDrgImgNum;
+    private JButton btnConnection;
 
     private SettingsDialog settingsDialog;
     private NodeIdsHashCreator nodeIdsHashCreator;
-    private TosDelugeExecutor tosDelugeExecutor;
     private MoteMessageService moteMessageService;
-    private JButton btnConnection;
+    private TosDelugeCommandFactory tosDelugeCommandFactory;
+    private ProcessExecutor processExecutor;
+    private JLabel lblDrgGroupId;
+    private JButton btnDrgExecute;
 
     /**
      * Create the application.
@@ -75,8 +79,56 @@ public class MainWindow extends JFrame {
         initializeGui();
         initializeNodeIdsHashCreator();
         initializeSettingsDialog();
-        initializeTosDelugeExecutor();
+        initializeTosDelugeCommandFactory();
+        initializeProcessExecutor();
         initializeMoteMessageService();
+        initializeCommandTextFields();
+    }
+
+    private void initializeCommandTextFields() {
+
+        updateInstallCmdTextField();
+        updateDisseminateRebootTextField();
+        updateDisseminateRebootNodesTextField();
+        updateDisseminateRebootGroupTextField();
+        updateUpdateNodeGroupTextField();
+    }
+
+    private void updateInstallCmdTextField() {
+
+        tfInstallCmd.setText(buildInstallCommand().toString());
+    }
+
+    private void updateDisseminateRebootTextField() {
+
+        tfDrCmd.setText(buildDisseminateRebootCommand().toString());
+    }
+
+    private void updateDisseminateRebootNodesTextField() {
+
+        tfDrnCmd.setText(buildDisseminateRebootNodesCommand().toString());
+    }
+
+    private void updateDisseminateRebootGroupTextField() {
+
+        tfDrgCmd.setText(buildDisseminateRebootGroupCommand().toString());
+    }
+
+    private void updateUpdateNodeGroupTextField() {
+
+        tfUngCmd.setText(buildUpdateNodeGroupCommand().toString());
+    }
+
+    private void initializeProcessExecutor() {
+
+        HashMap<String, String> envVariables = new HashMap<String, String>();
+        envVariables.put("TOSROOT", "/opt/retasking-wsn-tinyos");
+        processExecutor = new ProcessExecutor(envVariables);
+    }
+
+    private void initializeTosDelugeCommandFactory() {
+
+        tosDelugeCommandFactory = new TosDelugeCommandFactory(settingsDialog.getSource());
     }
 
     private void initializeNodeIdsHashCreator() {
@@ -87,13 +139,6 @@ public class MainWindow extends JFrame {
     private void initializeSettingsDialog() {
 
         settingsDialog = new SettingsDialog("serial@/dev/ttyUSB1:57600");
-    }
-
-    private void initializeTosDelugeExecutor() {
-
-        HashMap<String, String> envVariables = new HashMap<String, String>();
-        envVariables.put("TOSROOT", "/opt/retasking-wsn-tinyos");
-        tosDelugeExecutor = new TosDelugeExecutor(settingsDialog.getSource(), envVariables);
     }
 
     private void initializeMoteMessageService() {
@@ -113,6 +158,12 @@ public class MainWindow extends JFrame {
         pDisseminateReboot.add(lblDrImgNum, "cell 0 0,alignx trailing");
 
         cbDrImgNum = new JComboBox();
+        cbDrImgNum.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateDisseminateRebootTextField();
+            }
+        });
         cbDrImgNum.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4"}));
         pDisseminateReboot.add(cbDrImgNum, "cell 1 0,growx");
 
@@ -121,7 +172,6 @@ public class MainWindow extends JFrame {
 
         tfDrCmd = new JTextField();
         tfDrCmd.setEditable(false);
-        tfDrCmd.setText("tos-deluge command");
         pDisseminateReboot.add(tfDrCmd, "cell 1 1,growx");
         tfDrCmd.setColumns(10);
 
@@ -145,6 +195,12 @@ public class MainWindow extends JFrame {
         pInstall.add(lblInstallImgNum, "cell 0 0,alignx trailing");
 
         cbInstallImgNum = new JComboBox();
+        cbInstallImgNum.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateInstallCmdTextField();
+            }
+        });
         cbInstallImgNum.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4"}));
         pInstall.add(cbInstallImgNum, "flowx,cell 1 0,growx");
 
@@ -152,7 +208,7 @@ public class MainWindow extends JFrame {
         pInstall.add(lblTosimagexml, "cell 0 1,alignx trailing");
 
         tfInstallTosImagePath = new JTextField();
-        tfInstallTosImagePath.setText("path to tos_image.xml");
+        tfInstallTosImagePath.setText("path-to-tos_image.xml");
         tfInstallTosImagePath.setEditable(false);
         pInstall.add(tfInstallTosImagePath, "cell 1 1,growx");
         tfInstallTosImagePath.setColumns(10);
@@ -170,7 +226,6 @@ public class MainWindow extends JFrame {
         pInstall.add(lblInstallCmd, "cell 0 2,alignx trailing");
 
         tfInstallCmd = new JTextField();
-        tfInstallCmd.setText("tos-deluge command");
         tfInstallCmd.setToolTipText("");
         tfInstallCmd.setEditable(false);
         pInstall.add(tfInstallCmd, "cell 1 2,growx");
@@ -193,6 +248,7 @@ public class MainWindow extends JFrame {
         if (nodeIdsHashCreator.display(Long.parseLong(tfDrnNodeIds.getText())) == net.tinyos.dviz.NodeIdsHashCreator.DialogResult.OK) {
 
             tfDrnNodeIds.setText(Long.toString(nodeIdsHashCreator.getNodeIdsHash()));
+            updateDisseminateRebootNodesTextField();
         }
 
     }
@@ -230,6 +286,7 @@ public class MainWindow extends JFrame {
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 
             tfInstallTosImagePath.setText(fileChooser.getSelectedFile().getAbsolutePath());
+            updateInstallCmdTextField();
         }
 
     }
@@ -250,54 +307,75 @@ public class MainWindow extends JFrame {
         }
     }
 
-    private void executeInstall() {
+    private ICommand buildInstallCommand() {
 
         // Get parameters
         int imageNum = Integer.parseInt((String) cbInstallImgNum.getSelectedItem());
         String pathToTosImageXml = tfInstallTosImagePath.getText();
 
-        // Execute and display command results
-        displayTosDelugeResults(tosDelugeExecutor.install(imageNum, pathToTosImageXml));
-
+        return tosDelugeCommandFactory.install(imageNum, pathToTosImageXml);
     }
 
-    private void executeDisseminateReboot() {
+    private void executeInstall() {
+
+        // Execute and display command results
+        displayTosDelugeResults(processExecutor.execute(buildInstallCommand()));
+    }
+
+    private ICommand buildDisseminateRebootCommand() {
 
         // Get parameters
         int imageNum = Integer.parseInt((String) cbDrImgNum.getSelectedItem());
 
+        return tosDelugeCommandFactory.disseminateReboot(imageNum);
+    }
+
+    private void executeDisseminateReboot() {
+
         // Execute and display command results
-        displayTosDelugeResults(tosDelugeExecutor.disseminateReboot(imageNum));
+        displayTosDelugeResults(processExecutor.execute(buildDisseminateRebootCommand()));
+    }
+
+    private ICommand buildDisseminateRebootNodesCommand() {
+
+        // Get parameters
+        int imageNum = Integer.parseInt((String) cbDrnImgNum.getSelectedItem());
+        long nodeIdsHash = Long.parseLong(tfDrnNodeIds.getText());
+
+        return tosDelugeCommandFactory.disseminateRebootNodes(imageNum, nodeIdsHash);
     }
 
     private void executeDisseminateRebootNodes() {
 
-        // Get parameters
-        int imageNum = Integer.parseInt((String) cbDrnImgNum.getSelectedItem());
-
-        long nodeIdsHash = Long.parseLong(tfDrnNodeIds.getText());
-
-        displayTosDelugeResults(tosDelugeExecutor.disseminateRebootNodes(imageNum, nodeIdsHash));
-
+        displayTosDelugeResults(processExecutor.execute(buildDisseminateRebootNodesCommand()));
     }
 
-    private void executeDisseminateRebootGroup() {
+    private ICommand buildDisseminateRebootGroupCommand() {
 
         // Get parameters
         int imageNum = Integer.parseInt((String) cbDrgImgNum.getSelectedItem());
         int groupId = Integer.parseInt(tfDrgGroupId.getText());
 
-        displayTosDelugeResults(tosDelugeExecutor.disseminateRebootGroup(imageNum, groupId));
-
+        return tosDelugeCommandFactory.disseminateRebootGroup(imageNum, groupId);
     }
 
-    private void executeUpdateNodeGroup() {
+    private void executeDisseminateRebootGroup() {
+
+        displayTosDelugeResults(processExecutor.execute(buildDisseminateRebootGroupCommand()));
+    }
+
+    private ICommand buildUpdateNodeGroupCommand() {
+
         // Get parameters
         long nodeIdsHash = Long.parseLong(tfUngNodeIds.getText());
         int groupId = Integer.parseInt(tfUngGroupId.getText());
 
-        displayTosDelugeResults(tosDelugeExecutor.updateGroup(nodeIdsHash, groupId));
+        return tosDelugeCommandFactory.updateGroup(nodeIdsHash, groupId);
+    }
 
+    private void executeUpdateNodeGroup() {
+
+        displayTosDelugeResults(processExecutor.execute(buildUpdateNodeGroupCommand()));
     }
 
     private void displayTosDelugeResults(ProcessResult processResult) {
@@ -320,6 +398,12 @@ public class MainWindow extends JFrame {
         pDisseminateRebootNodes.add(lbDrnImgNum, "cell 0 0,alignx trailing");
 
         cbDrnImgNum = new JComboBox();
+        cbDrnImgNum.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateDisseminateRebootNodesTextField();
+            }
+        });
         cbDrnImgNum.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4"}));
         pDisseminateRebootNodes.add(cbDrnImgNum, "cell 1 0,growx");
 
@@ -346,7 +430,6 @@ public class MainWindow extends JFrame {
 
         tfDrnCmd = new JTextField();
         tfDrnCmd.setEditable(false);
-        tfDrnCmd.setText("tos-deluge command");
         pDisseminateRebootNodes.add(tfDrnCmd, "cell 1 2,growx,aligny top");
         tfDrnCmd.setColumns(10);
 
@@ -369,27 +452,24 @@ public class MainWindow extends JFrame {
         pDisseminateRebootGroup.add(lblDrgImgNum, "cell 0 0,alignx trailing");
 
         cbDrgImgNum = new JComboBox();
+        cbDrgImgNum.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateDisseminateRebootGroupTextField();
+            }
+        });
         cbDrgImgNum.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4"}));
         pDisseminateRebootGroup.add(cbDrgImgNum, "cell 1 0,growx");
-
-        JLabel lblDrgGroupId = new JLabel("group ID:");
-        pDisseminateRebootGroup.add(lblDrgGroupId, "cell 0 1,alignx trailing");
-
-        tfDrgGroupId = new JTextField();
-        tfDrgGroupId.setText("1");
-        pDisseminateRebootGroup.add(tfDrgGroupId, "cell 1 1,growx");
-        tfDrgGroupId.setColumns(10);
 
         JLabel lblDrgCmd = new JLabel("command:");
         pDisseminateRebootGroup.add(lblDrgCmd, "cell 0 2,alignx trailing");
 
         tfDrgCmd = new JTextField();
-        tfDrgCmd.setText("tos-deluge command");
         tfDrgCmd.setEditable(false);
         pDisseminateRebootGroup.add(tfDrgCmd, "cell 1 2,growx");
         tfDrgCmd.setColumns(10);
 
-        JButton btnDrgExecute = new JButton("Execute");
+        btnDrgExecute = new JButton("Execute");
         btnDrgExecute.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -398,6 +478,25 @@ public class MainWindow extends JFrame {
             }
         });
         pDisseminateRebootGroup.add(btnDrgExecute, "cell 2 2");
+
+        lblDrgGroupId = new JLabel("group ID:");
+        pDisseminateRebootGroup.add(lblDrgGroupId, "cell 0 1,alignx trailing");
+
+        tfDrgGroupId = new JTextField();
+        tfDrgGroupId.setText("0");
+        // Register DocumentListener after the setText!
+        tfDrgGroupId.getDocument().addDocumentListener(
+                new GroupIdTextFieldDocListener(lblDrgGroupId, tfDrgGroupId, btnDrgExecute, new GroupIdChangedListener() {
+
+                    @Override
+                    public void valueChanged(String newValue) {
+
+                        updateDisseminateRebootGroupTextField();
+
+                    }
+                }));
+        pDisseminateRebootGroup.add(tfDrgGroupId, "cell 1 1,growx");
+        tfDrgGroupId.setColumns(10);
 
     }
 
@@ -423,22 +522,40 @@ public class MainWindow extends JFrame {
         });
         pUpdateGroup.add(btnUngUpdate, "cell 2 0");
 
-        JLabel lblUngGroupId = new JLabel("group ID:");
-        pUpdateGroup.add(lblUngGroupId, "cell 0 1,alignx trailing");
-
-        tfUngGroupId = new JTextField();
-        tfUngGroupId.setText("1");
-        pUpdateGroup.add(tfUngGroupId, "cell 1 1,growx");
-        tfUngGroupId.setColumns(10);
-
         JLabel lblUngCmd = new JLabel("command:");
         pUpdateGroup.add(lblUngCmd, "cell 0 2,alignx trailing");
 
         tfUngCmd = new JTextField();
         tfUngCmd.setEditable(false);
-        tfUngCmd.setText("tos-deluge command");
         pUpdateGroup.add(tfUngCmd, "cell 1 2,growx");
         tfUngCmd.setColumns(10);
+
+        JButton btnUngExecute = new JButton("Execute");
+        btnUngExecute.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                executeUpdateNodeGroup();
+            }
+        });
+        pUpdateGroup.add(btnUngExecute, "cell 2 2");
+
+        JLabel lblUngGroupId = new JLabel("group ID:");
+        pUpdateGroup.add(lblUngGroupId, "cell 0 1,alignx trailing");
+
+        tfUngGroupId = new JTextField();
+        tfUngGroupId.setText("0");
+        tfUngGroupId.getDocument().addDocumentListener(
+                new GroupIdTextFieldDocListener(lblUngGroupId, tfUngGroupId, btnUngExecute, new GroupIdChangedListener() {
+
+                    @Override
+                    public void valueChanged(String newValue) {
+                        updateUpdateNodeGroupTextField();
+
+                    }
+                }));
+        pUpdateGroup.add(tfUngGroupId, "cell 1 1,growx");
+        tfUngGroupId.setColumns(10);
 
     }
 
@@ -457,7 +574,7 @@ public class MainWindow extends JFrame {
 
                 if (settingsDialog.display() == DialogResult.OK) {
 
-                    tosDelugeExecutor.setSource(settingsDialog.getSource());
+                    tosDelugeCommandFactory.setSource(settingsDialog.getSource());
                 }
             }
         });
@@ -562,16 +679,6 @@ public class MainWindow extends JFrame {
 
         tpCommands.addTab("Update-Group", pUpdateGroup);
         initializeUpdateGroupPanel(pUpdateGroup);
-
-        JButton btnUngExecute = new JButton("Execute");
-        btnUngExecute.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                executeUpdateNodeGroup();
-            }
-        });
-        pUpdateGroup.add(btnUngExecute, "cell 2 2");
 
         taConsole = new JTextArea();
         initializeTextArea(taConsole);
