@@ -93,8 +93,7 @@ public class ProcessExecutor {
 
             while ((line = outputFromProcess.readLine()) != null) {
 
-                // TODO: Should the newline be added back
-                output.append(line);
+                output.append(line + "\n");
             }
 
             String outputFromCommand = output.toString();

@@ -26,25 +26,34 @@ public class SettingsDialog extends JDialog {
     private JTextField tfSource;
 
     private String source;
+    private String tosDeluge;
+    private JTextField tfTosDeluge;
 
     public String getSource() {
+
         return source;
+    }
+
+    public String getTosDeluge() {
+
+        return tosDeluge;
     }
 
     /**
      * Create the dialog.
      */
-    public SettingsDialog(String defaultSource) {
+    public SettingsDialog(String defaultSource, String defaultTosDeluge) {
         this.source = defaultSource;
+        this.tosDeluge = defaultTosDeluge;
 
         setTitle("Settings");
-        setBounds(100, 100, 450, 105);
+        setBounds(100, 100, 450, 135);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         getContentPane().add(contentPanel, BorderLayout.CENTER);
-        contentPanel.setLayout(new MigLayout("", "[][grow]", "[]"));
+        contentPanel.setLayout(new MigLayout("", "[][grow]", "[][]"));
         {
-            JLabel lblSource = new JLabel("Source:");
+            JLabel lblSource = new JLabel("source:");
             contentPanel.add(lblSource, "cell 0 0,alignx trailing");
         }
         {
@@ -52,6 +61,16 @@ public class SettingsDialog extends JDialog {
             tfSource.setText(source);
             contentPanel.add(tfSource, "cell 1 0,growx");
             tfSource.setColumns(10);
+        }
+        {
+            JLabel lblTosDelugePath = new JLabel("tos-deluge path:");
+            contentPanel.add(lblTosDelugePath, "cell 0 1,alignx trailing");
+        }
+        {
+            tfTosDeluge = new JTextField();
+            tfTosDeluge.setText("tos-deluge");
+            contentPanel.add(tfTosDeluge, "cell 1 1,growx");
+            tfTosDeluge.setColumns(10);
         }
         {
             JPanel buttonPane = new JPanel();
@@ -64,6 +83,7 @@ public class SettingsDialog extends JDialog {
                     public void actionPerformed(ActionEvent e) {
 
                         source = tfSource.getText();
+                        tosDeluge = tfTosDeluge.getText();
                         result = DialogResult.OK;
                         SettingsDialog.this.close();
                     }
@@ -79,6 +99,7 @@ public class SettingsDialog extends JDialog {
                     public void actionPerformed(ActionEvent e) {
 
                         tfSource.setText(source);
+                        tfTosDeluge.setText(tosDeluge);
                         result = DialogResult.Cancel;
                         SettingsDialog.this.close();
                     }

@@ -128,7 +128,7 @@ public class MainWindow extends JFrame {
 
     private void initializeTosDelugeCommandFactory() {
 
-        tosDelugeCommandFactory = new TosDelugeCommandFactory(settingsDialog.getSource());
+        tosDelugeCommandFactory = new TosDelugeCommandFactory(settingsDialog.getSource(), settingsDialog.getTosDeluge());
     }
 
     private void initializeNodeIdsHashCreator() {
@@ -138,7 +138,7 @@ public class MainWindow extends JFrame {
 
     private void initializeSettingsDialog() {
 
-        settingsDialog = new SettingsDialog("serial@/dev/ttyUSB1:57600");
+        settingsDialog = new SettingsDialog("serial@/dev/ttyUSB1:57600", "tos-deluge");
     }
 
     private void initializeMoteMessageService() {
@@ -380,7 +380,7 @@ public class MainWindow extends JFrame {
 
     private void displayTosDelugeResults(ProcessResult processResult) {
 
-        taConsole.append(processResult.getCommand().toString() + "\n");
+        taConsole.append(String.format("Command: %s\n", processResult.getCommand().toString()));
         taConsole.append(processResult.toString());
     }
 
@@ -575,6 +575,8 @@ public class MainWindow extends JFrame {
                 if (settingsDialog.display() == DialogResult.OK) {
 
                     tosDelugeCommandFactory.setSource(settingsDialog.getSource());
+                    tosDelugeCommandFactory.setTosDeluge(settingsDialog.getTosDeluge());
+                    initializeCommandTextFields();
                 }
             }
         });
@@ -584,11 +586,10 @@ public class MainWindow extends JFrame {
 
     private void initializeNodeTable(JTable tbNodeStatus2) {
 
-        tableNodeStatus.setModel(new DefaultTableModel(new Object[][] {{null, null, null, null, null, null},}, new String[] {"", "Node ID",
-            "Group ID", "State", "App UID", "App Name"}) {
-            Class<?>[] columnTypes = new Class[] {Boolean.class, Integer.class, Integer.class, String.class, Integer.class, String.class};
+        tableNodeStatus.setModel(new DefaultTableModel(new Object[][] {{null, null, null, null, null},}, new String[] {"Node ID", "Group ID",
+            "State", "App UID", "App Name"}) {
+            Class<?>[] columnTypes = new Class[] {Integer.class, Integer.class, String.class, Integer.class, String.class};
 
-            @Override
             public Class<?> getColumnClass(int columnIndex) {
                 return columnTypes[columnIndex];
             }
