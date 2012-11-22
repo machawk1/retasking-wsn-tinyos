@@ -70,6 +70,8 @@ public class MainWindow extends JFrame {
     private ProcessExecutor processExecutor;
     private JLabel lblDrgGroupId;
     private JButton btnDrgExecute;
+    private JTextField tfPingCmd;
+    private JComboBox cbPingImgNum;
 
     /**
      * Create the application.
@@ -88,10 +90,16 @@ public class MainWindow extends JFrame {
     private void initializeCommandTextFields() {
 
         updateInstallCmdTextField();
+        updatePingCmdTextField();
         updateDisseminateRebootTextField();
         updateDisseminateRebootNodesTextField();
         updateDisseminateRebootGroupTextField();
         updateUpdateNodeGroupTextField();
+    }
+
+    private void updatePingCmdTextField() {
+
+        tfPingCmd.setText(buildPingCommand().toString());
     }
 
     private void updateInstallCmdTextField() {
@@ -149,6 +157,40 @@ public class MainWindow extends JFrame {
         subscribers.add(new MessageSubscriber(null, null));
         moteMessageService = new MoteMessageService(subscribers);
 
+    }
+
+    private void initializePingPanel(JPanel pPing) {
+
+        pPing.setLayout(new MigLayout("", "[][grow][]", "[][]"));
+
+        JLabel lblPingImgNumber = new JLabel("image number:");
+        pPing.add(lblPingImgNumber, "cell 0 0,alignx trailing");
+
+        cbPingImgNum = new JComboBox();
+        cbPingImgNum.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updatePingCmdTextField();
+            }
+        });
+        cbPingImgNum.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4"}));
+        pPing.add(cbPingImgNum, "cell 1 0,growx");
+
+        JLabel lblPingCmd = new JLabel("command:");
+        pPing.add(lblPingCmd, "cell 0 1,alignx trailing");
+
+        tfPingCmd = new JTextField();
+        tfPingCmd.setEditable(false);
+        pPing.add(tfPingCmd, "cell 1 1,growx");
+        tfPingCmd.setColumns(10);
+
+        JButton btnPingExecute = new JButton("Execute");
+        btnPingExecute.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                executePing();
+            }
+        });
+        pPing.add(btnPingExecute, "cell 2 1");
     }
 
     private void initializeDisseminateRebootPanel(JPanel pDisseminateReboot) {
@@ -320,6 +362,19 @@ public class MainWindow extends JFrame {
 
         // Execute and display command results
         displayTosDelugeResults(processExecutor.execute(buildInstallCommand()));
+    }
+
+    private void executePing() {
+
+        // Execute and display command results
+        displayTosDelugeResults(processExecutor.execute(buildPingCommand()));
+    }
+
+    private ICommand buildPingCommand() {
+
+        int imageNum = Integer.parseInt((String) cbPingImgNum.getSelectedItem());
+
+        return tosDelugeCommandFactory.ping(imageNum);
     }
 
     private ICommand buildDisseminateRebootCommand() {
@@ -661,6 +716,7 @@ public class MainWindow extends JFrame {
         spCommandTabs.setViewportView(tpCommands);
 
         JPanel pInstall = new JPanel();
+        JPanel pPing = new JPanel();
         JPanel pDisseminateReboot = new JPanel();
         JPanel pDisseminateRebootNodes = new JPanel();
         JPanel pDisseminateRebootGroup = new JPanel();
@@ -668,6 +724,9 @@ public class MainWindow extends JFrame {
 
         tpCommands.addTab("Install", pInstall);
         initializeInstallPanel(pInstall);
+
+        tpCommands.addTab("Ping", pPing);
+        initializePingPanel(pPing);
 
         tpCommands.addTab("Disseminate-Reboot", pDisseminateReboot);
         initializeDisseminateRebootPanel(pDisseminateReboot);

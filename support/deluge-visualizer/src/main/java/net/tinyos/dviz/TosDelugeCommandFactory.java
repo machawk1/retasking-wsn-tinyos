@@ -38,6 +38,13 @@ public class TosDelugeCommandFactory {
         return new DefaultCommand(command, "ERROR");
     }
 
+    public ICommand ping(int imageNum) {
+
+        final String[] command = {tosDeluge, source, "-p", Integer.toString(imageNum)};
+
+        return new DefaultCommand(command, "ERROR");
+    }
+
     public ICommand disseminateReboot(int imageNum) {
 
         final String[] command = {tosDeluge, source, "-dr", Integer.toString(imageNum)};
