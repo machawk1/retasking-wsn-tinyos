@@ -381,14 +381,14 @@ public class MainWindow extends JFrame {
     private void displayTosDelugeResults(ProcessResult processResult) {
 
         taConsole.append(String.format("Command: %s\n", processResult.getCommand().toString()));
-        taConsole.append(processResult.toString());
+        taConsole.append(String.format("%s\n\n", processResult.toString()));
     }
 
     private void displayMoteMessageServiceStatusError(ServiceStatus serviceStatus) {
 
         taConsole.append(String.format("Attempted to start the MoteMessageService (Source=\"%s\") but captured the following error:\n",
                 serviceStatus.getSource()));
-        taConsole.append(serviceStatus.getErrorText());
+        taConsole.append(String.format("%s\n\n", serviceStatus.getErrorText()));
     }
 
     private void initializeDisseminateRebootNodesPanel(JPanel pDisseminateRebootNodes) {
