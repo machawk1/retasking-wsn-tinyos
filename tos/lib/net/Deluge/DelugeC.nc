@@ -96,6 +96,7 @@ implementation
 #endif
 
 #ifdef DELUGE_BASESTATION
+  components CollectionStarterC;
   components new DelugeManagerC(DELUGE_AM_DELUGE_MANAGER);
 
   DelugeManagerC.DisseminationUpdate -> DisseminatorC;
