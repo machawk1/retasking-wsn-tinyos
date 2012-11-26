@@ -57,6 +57,7 @@ enum {
   DELUGE_KEY = 0xDE00,
   DELUGE_AM_FLASH_VOL_MANAGER = 0x53,
   DELUGE_AM_DELUGE_MANAGER = 0x54,
+  DELUGE_AM_NODE_STATUS = 0x55
 };
 
 enum {
@@ -77,6 +78,13 @@ enum {
 #endif
 
 uint8_t DELUGE_GROUP_ID = DELUGE_GROUP_ID_DEFAULT;
+
+typedef nx_struct NodeStatus {
+    nx_uint32_t nodeId;
+    nx_uint8_t groupId;
+    nx_uint8_t state;
+    nx_uint32_t appUid;
+} NodeStatus;
 
 
 #define UQ_DELUGE_METADATA "DelugeMetadata.client"

@@ -51,6 +51,7 @@ generic module DelugeManagerP()
     interface DelugeVolumeManager;
     interface Resource;
     command void stop();
+    interface AMSend as NodeStatusSender;
   }
 }
 
@@ -169,4 +170,10 @@ implementation
   event void ObjectTransfer.receiveDone(error_t error) {}
   event void SerialAMSender.sendDone(message_t* msg, error_t error) {}
   event void DelugeVolumeManager.eraseDone(uint8_t imgNum) {}
+
+  event void NodeStatusSender.sendDone(message_t *msg, error_t error) 
+  {
+      //Add logic to control serial data being sent - only send data when finished with previous message or
+      //use a queue (e.g MultihopOscilloscope)
+  }
 }
