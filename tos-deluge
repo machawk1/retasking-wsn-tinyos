@@ -365,6 +365,13 @@ def ping(imgNum):
     print "--------------------------------------------------"
     return False
 
+def pingNode():
+    print "--------------------------------------------------"
+    print "Currently Executing:"
+    print formatShortIdent(ident())
+    print "--------------------------------------------------"
+    return True
+
 def boot():
     sreqpkt = DMReqPacket((DM_CMD_BOOT, 0, 0, 0))
     success = am.write(sreqpkt, DM_AMID)
@@ -419,6 +426,7 @@ def print_usage():
     print "     serial@PORT:SPEED   Serial ports"
     print "     network@HOST:PORT   MIB600"
     print "  -p --ping        Provide status of the image in the external flash"
+    print "  -pn --ping-node  Provide status of the node's currently running image"
     print "  -i --inject      Inject a compiled TinyOS application"
     print "                   [options]: tos_image.xml file path"
     print "  -e --erase       Erase an image in the external flash"
@@ -488,6 +496,8 @@ if len(sys.argv) >= 3:
         checkImgNum()
         print "Pinging node ..."
         ping(imgNum)
+    elif sys.argv[2] in ["-pn", "--ping-node"]:
+        pingNode()
     elif sys.argv[2] in ["-i", "--inject"] and len(sys.argv) == 5:
         checkImgNum()
         print "Pinging node ..."
