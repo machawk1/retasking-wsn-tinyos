@@ -74,11 +74,18 @@ implementation
   components new DelugeVolumeManagerClientC();
   components new BlockStorageLockClientC();
   components MainC;
+  
+  //Start CollectionC at boot (for Root and Nodes)
+  components CollectionStarterC;
 
   DelugeP.Boot -> MainC;
   DelugeP.Leds = Leds;  
 #ifndef DELUGE_BASESTATION
   DelugeP.DisseminationValue -> DisseminatorC;
+
+  //Setup Collection Nodes (NodeStatus messages)
+  components new CollectionSenderC(DELUGE_COL_NODE_STATUS) as NodeStatusSender;
+  DelugeP.NodeStatusSender -> NodeStatusSender; 
 #endif
   DelugeP.DisseminationStdControl -> DisseminationC;
   DelugeP.ObjectTransfer -> ObjectTransferC;
@@ -96,7 +103,6 @@ implementation
 #endif
 
 #ifdef DELUGE_BASESTATION
-  components CollectionStarterC;
   components new DelugeManagerC(DELUGE_AM_DELUGE_MANAGER);
 
   DelugeManagerC.DisseminationUpdate -> DisseminatorC;

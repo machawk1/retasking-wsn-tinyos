@@ -48,6 +48,7 @@ module DelugeP
         interface DelugeMetadata;
         interface DelugeVolumeManager;
         interface Resource;
+        interface Send as NodeStatusSender;
     }
     provides {
         event void storageReady();
@@ -256,6 +257,8 @@ implementation
                 break;
         }
     }
+
+    event void NodeStatusSender.sendDone(message_t *msg, error_t ok) { }
 
     event void DelugeVolumeManager.eraseDone(uint8_t imgNum) {}
     event void RadioSplitControl.stopDone(error_t error) {}
