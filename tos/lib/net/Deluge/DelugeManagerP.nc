@@ -51,7 +51,13 @@ generic module DelugeManagerP()
     interface DelugeVolumeManager;
     interface Resource;
     command void stop();
+
+    //Serial interface for NodeStatus messages
     interface AMSend as NodeStatusSender;
+    //Collection interfaces for receiving NodeStatus messages
+    interface StdControl as CollectionControl;
+    interface RootControl;
+    interface Receive as NodeStatusReceive;
   }
 }
 
@@ -176,4 +182,11 @@ implementation
       //Add logic to control serial data being sent - only send data when finished with previous message or
       //use a queue (e.g MultihopOscilloscope)
   }
+
+  event message_t* NodeStatusReceive.receive(message_t* msg, void* payload, uint8_t len)
+  {
+
+      return msg;
+  }
+
 }

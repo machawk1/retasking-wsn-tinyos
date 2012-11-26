@@ -8,7 +8,7 @@ TOSBOOT_DIR ?= $(TOSDIR)/lib/tosboot/build
 ifeq ($(BOOTLOADER),tosboot)
 
   CFLAGS += -DDELUGE
-  CFLAGS += -I$(TOSDIR)/lib/net -I$(TOSDIR)/lib/net/drip -I$(DELUGE_DIR) -I$(DELUGE_DIR)/FlashVolumeManager -I$(DELUGE_DIR)/BlockStorageManager
+  CFLAGS += -I$(TOSDIR)/lib/net -I$(TOSDIR)/lib/net/le -I$(TOSDIR)/lib/net/ctp -I$(TOSDIR)/lib/net/drip -I$(DELUGE_DIR) -I$(DELUGE_DIR)/FlashVolumeManager -I$(DELUGE_DIR)/BlockStorageManager
 
   ifneq ($(filter telosb tmote epic,$(TARGETS)),)
     CFLAGS += -I$(DELUGE_EXTRA) -I$(DELUGE_EXTRA)/msp430 -I$(DELUGE_EXTRA)/telos

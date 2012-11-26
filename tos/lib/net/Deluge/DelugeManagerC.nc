@@ -54,9 +54,6 @@ implementation
   components new DelugeMetadataClientC();
   components new DelugeVolumeManagerClientC();
   components new BlockStorageLockClientC();
-  components new SerialAMSenderC(DELUGE_AM_NODE_STATUS) as NodeStatusSender;
-
-  DelugeManagerP.NodeStatusSender -> NodeStatusSender;
 
   DelugeManagerP.DelayTimer -> Timer;
   DelugeManagerP.SerialAMSender -> SerialAMSenderC;
@@ -70,6 +67,16 @@ implementation
   DelugeManagerP.DelugeMetadata -> DelugeMetadataClientC;
   DelugeManagerP.DelugeVolumeManager -> DelugeVolumeManagerClientC;
   DelugeManagerP.Resource -> BlockStorageLockClientC;
+
+  //Setup Serial communication to PC (NodeStatus messages)
+  components new SerialAMSenderC(DELUGE_AM_NODE_STATUS) as NodeStatusSender;
+  DelugeManagerP.NodeStatusSender -> NodeStatusSender;
+
+  //Setup Collection (Root for NodeStatus messages)
+  components CollectionC;
+  DelugeManagerP.CollectionControl ->  CollectionC;
+  DelugeManagerP.RootControl -> CollectionC;
+  DelugeManagerP.NodeStatusReceive -> CollectionC.Receive[DELUGE_COL_NODE_STATUS];
 
   components DelugeP;
   DelugeManagerP.stop -> DelugeP;
