@@ -72,6 +72,8 @@ implementation
     DelugeCmd lastCmd;
     uint8_t state = S_IDLE;
 
+    message_t nodeStatusMsg;
+
     event void storageReady()
     {
         call RadioSplitControl.start();
@@ -96,9 +98,28 @@ implementation
         }
     }
 
+    //Send NodeStatus message (via Collection)
     event void NodeStatusTimer.fired()
     {
-        //Send NodeStatus message (via Collection)
+        //Get payload (NodeStatus)
+        NodeStatus *newNodeStatus = call NodeStatusSender.getPayload(&nodeStatusMsg, sizeof(NodeStatus));
+
+        if(newNodeStatus != NULL)
+        {
+            //Fill in payload
+            newNodeStatus->nodeId = TOS_NODE_ID;
+            newNodeStatus->groupId = DELUGE_GROUP_ID;
+            newNodeStatus->state = state;
+            newNodeStatus->appUid = TOS_NODE_ID * 2; //Fix this!
+
+
+            //Send the message
+            if(call NodeStatusSender.send(&nodeStatusMsg, sizeof(NodeStatus)) != SUCCESS)
+            {
+                //Failed - do something with LEDS?
+            }
+
+        }
     }
 
     command void stop()
