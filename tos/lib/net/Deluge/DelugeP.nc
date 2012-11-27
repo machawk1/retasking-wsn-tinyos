@@ -51,6 +51,9 @@ module DelugeP
 
         //Collection interface for sending NodeStatus messages
         interface Send as NodeStatusSender;
+
+        //Interface for NodeStatus Timer
+        interface Timer<TMilli> as NodeStatusTimer;
     }
     provides {
         event void storageReady();
@@ -83,7 +86,19 @@ implementation
     {
         if (error == SUCCESS) {
             call DisseminationStdControl.start();
+
+#ifndef DELUGE_BASESTATION
+            //Start the NodeStatusTimer after the radio has been started
+            //1024 ticks per second
+            //5 second perodic
+            call NodeStatusTimer.startPeriodic(5120);
+#endif
         }
+    }
+
+    event void NodeStatusTimer.fired()
+    {
+        //Send NodeStatus message (via Collection)
     }
 
     command void stop()

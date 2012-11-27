@@ -86,6 +86,10 @@ implementation
   //Setup Collection Nodes (NodeStatus messages)
   components new CollectionSenderC(DELUGE_COL_NODE_STATUS) as NodeStatusSender;
   DelugeP.NodeStatusSender -> NodeStatusSender; 
+
+  //Setup timer for sending NodeStatus messages
+  components new TimerMilliC() as NodeStatusTimer;
+  DelugeP.NodeStatusTimer -> NodeStatusTimer;
 #endif
   DelugeP.DisseminationStdControl -> DisseminationC;
   DelugeP.ObjectTransfer -> ObjectTransferC;
