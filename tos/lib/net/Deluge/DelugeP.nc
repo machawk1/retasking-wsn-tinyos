@@ -48,6 +48,8 @@ module DelugeP
         interface DelugeMetadata;
         interface DelugeVolumeManager;
         interface Resource;
+
+        //Collection interface for sending NodeStatus messages
         interface Send as NodeStatusSender;
     }
     provides {

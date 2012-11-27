@@ -74,7 +74,6 @@ implementation
 
   //Setup Collection Root (NodeStatus messages)
   components CollectionC;
-  DelugeManagerP.RootControl -> CollectionC;
   DelugeManagerP.NodeStatusReceive -> CollectionC.Receive[DELUGE_COL_NODE_STATUS];
 
   components DelugeP;

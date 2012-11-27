@@ -2,7 +2,9 @@ configuration CollectionStarterC { }
 
 implementation
 {
-    components CollectionC, AutoStarterStdControlC;
+    components MainC, CollectionC, CollectionStarterP;
 
-    AutoStarterStdControlC.StdControl -> CollectionC;
+    CollectionStarterP.Boot -> MainC;
+    CollectionStarterP.StdControl -> CollectionC;
+    CollectionStarterP.RootControl -> CollectionC;
 }

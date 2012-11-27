@@ -56,7 +56,6 @@ generic module DelugeManagerP()
     interface AMSend as NodeStatusSender;
 
     //Collection interfaces for receiving NodeStatus messages
-    interface RootControl;
     interface Receive as NodeStatusReceive;
   }
 }
