@@ -1,6 +1,6 @@
 /* Copyright (c) 2007 Johns Hopkins University.
-*  All rights reserved.
-*
+ *  All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -27,7 +27,7 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 
 /**
  * @author Razvan Musaloiu-E. <razvanm@cs.jhu.edu>
@@ -38,154 +38,184 @@
 
 generic module DelugeManagerP()
 {
-  uses {
-    interface DisseminationUpdate<DelugeCmd>;
-    interface AMSend as SerialAMSender;
-    interface Receive as SerialAMReceiver;
-    interface Timer<TMilli> as DelayTimer;
-    interface NetProg;
-    interface Leds;
-    interface StorageMap[uint8_t volumeId];
-    interface DelugeMetadata;
-    interface ObjectTransfer;
-    interface DelugeVolumeManager;
-    interface Resource;
-    command void stop();
+    uses {
+        interface DisseminationUpdate<DelugeCmd>;
+        interface AMSend as SerialAMSender;
+        interface Receive as SerialAMReceiver;
+        interface Timer<TMilli> as DelayTimer;
+        interface NetProg;
+        interface Leds;
+        interface StorageMap[uint8_t volumeId];
+        interface DelugeMetadata;
+        interface ObjectTransfer;
+        interface DelugeVolumeManager;
+        interface Resource;
+        command void stop();
 
-    //Serial interface for NodeStatus messages
-    interface AMSend as NodeStatusSender;
+        //Serial interface for NodeStatus messages
+        interface AMSend as SerialNodeStatusSender;
 
-    //Collection interfaces for receiving NodeStatus messages
-    interface Receive as NodeStatusReceive;
-  }
+        //Collection interfaces for receiving NodeStatus messages
+        interface Receive as NodeStatusReceive;
+    }
 }
 
 implementation
 {
-  typedef nx_struct SerialReqPacket {
-    nx_uint8_t cmd;
-    nx_uint8_t imgNum;
-    nx_uint32_t nodeIds;  // Nodes to update
-    nx_uint8_t groupId;   // Group id
-  } SerialReqPacket;
-  
-  typedef nx_struct SerialReplyPacket {
-    nx_uint8_t error;
-  } SerialReplyPacket;
+    typedef nx_struct SerialReqPacket {
+        nx_uint8_t cmd;
+        nx_uint8_t imgNum;
+        nx_uint32_t nodeIds;  // Nodes to update
+        nx_uint8_t groupId;   // Group id
+    } SerialReqPacket;
 
-  message_t serialMsg;
-  DelugeCmd delugeCmd;
+    typedef nx_struct SerialReplyPacket {
+        nx_uint8_t error;
+    } SerialReplyPacket;
 
-  void sendReply(error_t error)
-  {
-    uint8_t len = sizeof(SerialReplyPacket);
-    SerialReplyPacket *reply = (SerialReplyPacket *)call SerialAMSender.getPayload(&serialMsg, len);
-    if (reply == NULL) {
-      return;
+    message_t serialMsg;
+    message_t serialNodeStatusMsg;
+    DelugeCmd delugeCmd;
+    bool serialBusy = FALSE;
+
+    void sendReply(error_t error)
+    {
+        uint8_t len = sizeof(SerialReplyPacket);
+        SerialReplyPacket *reply = (SerialReplyPacket *)call SerialAMSender.getPayload(&serialMsg, len);
+        if (reply == NULL) {
+            return;
+        }
+        reply->error = error;
+        call SerialAMSender.send(AM_BROADCAST_ADDR, &serialMsg, len);
     }
-    reply->error = error;
-    call SerialAMSender.send(AM_BROADCAST_ADDR, &serialMsg, len);
-  }
 
-  event message_t* SerialAMReceiver.receive(message_t* msg, void* payload, uint8_t len)
-  {
-    SerialReqPacket *request = (SerialReqPacket *)payload;
-    memset(&delugeCmd, 0, sizeof(DelugeCmd));
-    call stop();
-    delugeCmd.type = request->cmd;
-    // Converts the image number that the user wants to the real image number
-    request->imgNum = imgNum2volumeId(request->imgNum);
+    event message_t* SerialAMReceiver.receive(message_t* msg, void* payload, uint8_t len)
+    {
+        SerialReqPacket *request = (SerialReqPacket *)payload;
+        memset(&delugeCmd, 0, sizeof(DelugeCmd));
+        call stop();
+        delugeCmd.type = request->cmd;
+        // Converts the image number that the user wants to the real image number
+        request->imgNum = imgNum2volumeId(request->imgNum);
 
-    switch (request->cmd) {
-    case DELUGE_CMD_STOP:
-      call DisseminationUpdate.change(&delugeCmd);
-    case DELUGE_CMD_LOCAL_STOP:
-      sendReply(SUCCESS);
-      call Resource.release();
-      break;
-    case DELUGE_CMD_ONLY_DISSEMINATE:
-    case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM:
-    case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES:
-    case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_GROUP:
-      delugeCmd.nodeIds = request->nodeIds;
-      delugeCmd.groupId = request->groupId;
+        switch (request->cmd) {
+            case DELUGE_CMD_STOP:
+                call DisseminationUpdate.change(&delugeCmd);
+            case DELUGE_CMD_LOCAL_STOP:
+                sendReply(SUCCESS);
+                call Resource.release();
+                break;
+            case DELUGE_CMD_ONLY_DISSEMINATE:
+            case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM:
+            case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES:
+            case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_GROUP:
+                delugeCmd.nodeIds = request->nodeIds;
+                delugeCmd.groupId = request->groupId;
 
-      if (request->imgNum != NON_DELUGE_VOLUME &&
-              (call Resource.isOwner() || 
-               call Resource.immediateRequest() == SUCCESS)) {
-          call DelugeMetadata.read(request->imgNum);
-      } else {
-          sendReply(FAIL);
-      }
-      break;
-    case DELUGE_CMD_UPDATE_GROUP:
-      delugeCmd.nodeIds = request->nodeIds;
-      delugeCmd.groupId = request->groupId;
-      call DisseminationUpdate.change(&delugeCmd);
-      sendReply(SUCCESS);
-      break;
-    case DELUGE_CMD_REPROGRAM:
-    case DELUGE_CMD_REBOOT:
-      if (request->imgNum == NON_DELUGE_VOLUME) {
-	sendReply(FAIL);
-	break;
-      }
-      delugeCmd.imgNum = request->imgNum;
-      call DelayTimer.startOneShot(1024);
-      sendReply(SUCCESS);
-      break;
+                if (request->imgNum != NON_DELUGE_VOLUME &&
+                        (call Resource.isOwner() || 
+                         call Resource.immediateRequest() == SUCCESS)) {
+                    call DelugeMetadata.read(request->imgNum);
+                } else {
+                    sendReply(FAIL);
+                }
+                break;
+            case DELUGE_CMD_UPDATE_GROUP:
+                delugeCmd.nodeIds = request->nodeIds;
+                delugeCmd.groupId = request->groupId;
+                call DisseminationUpdate.change(&delugeCmd);
+                sendReply(SUCCESS);
+                break;
+            case DELUGE_CMD_REPROGRAM:
+            case DELUGE_CMD_REBOOT:
+                if (request->imgNum == NON_DELUGE_VOLUME) {
+                    sendReply(FAIL);
+                    break;
+                }
+                delugeCmd.imgNum = request->imgNum;
+                call DelayTimer.startOneShot(1024);
+                sendReply(SUCCESS);
+                break;
+        }
+
+        return msg;
     }
-    
-    return msg;
-  }
 
-  event void DelayTimer.fired()
-  {
-    switch (delugeCmd.type) {
-    case DELUGE_CMD_REPROGRAM:
-      call NetProg.programImageAndReboot(call StorageMap.getPhysicalAddress[delugeCmd.imgNum](0));
-      break;
-    case DELUGE_CMD_REBOOT:
-      call NetProg.reboot();
-      break;
+    event void DelayTimer.fired()
+    {
+        switch (delugeCmd.type) {
+            case DELUGE_CMD_REPROGRAM:
+                call NetProg.programImageAndReboot(call StorageMap.getPhysicalAddress[delugeCmd.imgNum](0));
+                break;
+            case DELUGE_CMD_REBOOT:
+                call NetProg.reboot();
+                break;
+        }
     }
-  }
 
-  event void DelugeMetadata.readDone(uint8_t imgNum, DelugeIdent* ident, error_t error)
-  {
-    delugeCmd.imgNum = imgNum;
-    sendReply(error);
-    if (error != SUCCESS) {
-      return;
+    event void DelugeMetadata.readDone(uint8_t imgNum, DelugeIdent* ident, error_t error)
+    {
+        delugeCmd.imgNum = imgNum;
+        sendReply(error);
+        if (error != SUCCESS) {
+            return;
+        }
+        switch (delugeCmd.type) {
+            case DELUGE_CMD_ONLY_DISSEMINATE:
+            case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM:
+            case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES:
+            case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_GROUP:
+                delugeCmd.uidhash = ident->uidhash;
+                delugeCmd.size = ident->size;
+                call DisseminationUpdate.change(&delugeCmd);
+                call ObjectTransfer.publish(delugeCmd.uidhash, delugeCmd.size, delugeCmd.imgNum);
+                break;
+        }    
     }
-    switch (delugeCmd.type) {
-    case DELUGE_CMD_ONLY_DISSEMINATE:
-    case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM:
-    case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES:
-    case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_GROUP:
-      delugeCmd.uidhash = ident->uidhash;
-      delugeCmd.size = ident->size;
-      call DisseminationUpdate.change(&delugeCmd);
-      call ObjectTransfer.publish(delugeCmd.uidhash, delugeCmd.size, delugeCmd.imgNum);
-      break;
-    }    
-  }
 
-  event void Resource.granted() {}
-  event void ObjectTransfer.receiveDone(error_t error) {}
-  event void SerialAMSender.sendDone(message_t* msg, error_t error) {}
-  event void DelugeVolumeManager.eraseDone(uint8_t imgNum) {}
+    event void Resource.granted() {}
+    event void ObjectTransfer.receiveDone(error_t error) {}
+    event void SerialAMSender.sendDone(message_t* msg, error_t error) {}
+    event void DelugeVolumeManager.eraseDone(uint8_t imgNum) {}
 
-  event void NodeStatusSender.sendDone(message_t *msg, error_t error) 
-  {
-      //Add logic to control serial data being sent - only send data when finished with previous message or
-      //use a queue (e.g MultihopOscilloscope)
-  }
+    event void SerialNodeStatusSender.sendDone(message_t *msg, error_t error) 
+    {
+        //Add logic to control serial data being sent - only send data when finished with previous message or
+        //use a queue (e.g MultihopOscilloscope)
+        
+        serialBusy = FALSE;
+    }
 
-  event message_t* NodeStatusReceive.receive(message_t* msg, void* payload, uint8_t len)
-  {
+    event message_t* NodeStatusReceive.receive(message_t* msg, void* payload, uint8_t len)
+    {
+        //Check to make sure payload size is correct
+        if((len == sizeof(NodeStatus)) && (serialBusy == FALSE))
+        {
+            //Cast payload to NodeStatus
+            NodeStatus *in = (NodeStatus*)payload;
 
-      return msg;
-  }
+            //Build NodeStatus payload for sending to serial
+            NodeStatus *out = (NodeStatus*)call SerialNodeStatusSender.getPayload(&serialNodeStatusMsg, sizeof(NodeStatus));
+
+            if(out != NULL)
+            {
+                //Copy "in" payload (Collection) to "out" payload (Serial)
+                memcpy(out, in, sizeof(NodeStatus));
+
+                //Set serialBusy flag
+                serialBusy = TRUE;
+
+                //Send to serial 
+                if(call SerialNodeStatusSender.send(AM_BROADCAST_ADDR, &serialNodeStatusMsg, sizeof(NodeStatus)) != SUCCESS)
+                {
+                    //Do something if there is an error
+                    serialBusy = FALSE;
+                }
+
+            }
+        }
+
+        return msg;
+    }
 
 }

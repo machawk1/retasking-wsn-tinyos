@@ -69,8 +69,8 @@ implementation
   DelugeManagerP.Resource -> BlockStorageLockClientC;
 
   //Setup Serial communication to PC (NodeStatus messages)
-  components new SerialAMSenderC(DELUGE_AM_NODE_STATUS) as NodeStatusSender;
-  DelugeManagerP.NodeStatusSender -> NodeStatusSender;
+  components new SerialAMSenderC(DELUGE_AM_NODE_STATUS) as SerialNodeStatusSender;
+  DelugeManagerP.SerialNodeStatusSender -> SerialNodeStatusSender;
 
   //Setup Collection Root (NodeStatus messages)
   components CollectionC;
