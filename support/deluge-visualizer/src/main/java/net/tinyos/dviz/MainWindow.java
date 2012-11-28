@@ -662,14 +662,22 @@ public class MainWindow extends JFrame {
 
     private void initializeNodeTable(JTable tbNodeStatus2) {
 
-        tableNodeStatus.setModel(new DefaultTableModel(new Object[][] {{null, null, null, null, null, null},}, new String[] {"Time", "Node ID",
-            "Group ID", "State", "App UID", "App Name"}) {
-            Class<?>[] columnTypes = new Class[] {String.class, Long.class, Short.class, Short.class, Long.class, String.class};
-
-            public Class<?> getColumnClass(int columnIndex) {
+        tableNodeStatus.setModel(new DefaultTableModel(
+            new Object[][] {
+                {null, null, null, null, null, null, null},
+            },
+            new String[] {
+                "Last Updated", "Node ID", "Group ID", "State", "App UID", "App Name", "App TimeStamp"
+            }
+        ) {
+            Class[] columnTypes = new Class[] {
+                String.class, Integer.class, Short.class, Short.class, Long.class, String.class, Long.class
+            };
+            public Class getColumnClass(int columnIndex) {
                 return columnTypes[columnIndex];
             }
         });
+        tableNodeStatus.getColumnModel().getColumn(6).setPreferredWidth(85);
 
     }
 

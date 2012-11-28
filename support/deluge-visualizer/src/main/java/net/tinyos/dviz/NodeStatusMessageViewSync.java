@@ -43,7 +43,8 @@ public class NodeStatusMessageViewSync implements MessageListener {
                 nodeStatusModel.setValueAt(message.get_groupId(), rowIndex, 2);
                 nodeStatusModel.setValueAt(message.get_state(), rowIndex, 3);
                 nodeStatusModel.setValueAt(message.get_appUid(), rowIndex, 4);
-                nodeStatusModel.setValueAt("", rowIndex, 5);
+                nodeStatusModel.setValueAt(message.getString_appName(), rowIndex, 5);
+                nodeStatusModel.setValueAt(message.get_appTimeStamp(), rowIndex, 6);
 
             }
         };
@@ -57,7 +58,7 @@ public class NodeStatusMessageViewSync implements MessageListener {
             public void run() {
 
                 nodeStatusModel.addRow(new Object[] {timeStamp, message.get_nodeId(), message.get_groupId(), message.get_state(),
-                    message.get_appUid(), ""});
+                    message.get_appUid(), message.getString_appName(), message.get_appTimeStamp()});
 
             }
         };
@@ -75,6 +76,7 @@ public class NodeStatusMessageViewSync implements MessageListener {
 
         } else {
 
+            nodeIdRowIndex.put(nodeId, nodeStatusModel.getRowCount());
             worktoPerform = addRow(timeStamp, message);
         }
 
