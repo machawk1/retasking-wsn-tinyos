@@ -1,5 +1,6 @@
 package net.tinyos.dviz;
 
+import net.tinyos.dviz.message.NodeStatus;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
@@ -153,8 +154,7 @@ public class MainWindow extends JFrame {
 
         ArrayList<MessageSubscriber> subscribers = new ArrayList<MessageSubscriber>();
 
-        // TODO: Fix null
-        subscribers.add(new MessageSubscriber(null, null));
+        subscribers.add(new MessageSubscriber(new NodeStatus(), new NodeStatusMessageViewSync((DefaultTableModel) tableNodeStatus.getModel())));
         moteMessageService = new MoteMessageService(subscribers);
 
     }
@@ -337,7 +337,29 @@ public class MainWindow extends JFrame {
 
         ServiceStatus serviceStatus = moteMessageService.start(settingsDialog.getSource());
 
+        if (serviceStatus.getStatus() == State.Stopped) {
+
+            displayMoteMessageServiceStatusError(serviceStatus);
+        }
+
+        updateButton(serviceStatus.getStatus());
+    }
+
+    private void stopMoteMessageService() {
+
+        ServiceStatus serviceStatus = moteMessageService.stop();
+
         if (serviceStatus.getStatus() == State.Running) {
+
+            displayMoteMessageServiceStatusError(serviceStatus);
+        }
+
+        updateButton(serviceStatus.getStatus());
+    }
+
+    private void updateButton(State currentStatus) {
+
+        if (currentStatus == State.Running) {
 
             btnConnection.setBackground(Color.GREEN);
             btnConnection.setText("Connected");
@@ -345,7 +367,6 @@ public class MainWindow extends JFrame {
 
             btnConnection.setBackground(Color.RED);
             btnConnection.setText("Disconnected");
-            displayMoteMessageServiceStatusError(serviceStatus);
         }
     }
 
@@ -641,18 +662,11 @@ public class MainWindow extends JFrame {
 
     private void initializeNodeTable(JTable tbNodeStatus2) {
 
-        tableNodeStatus.setModel(new DefaultTableModel(
-            new Object[][] {
-                {null, null, null, null, null, null},
-            },
-            new String[] {
-                "Time", "Node ID", "Group ID", "State", "App UID", "App Name"
-            }
-        ) {
-            Class[] columnTypes = new Class[] {
-                String.class, Integer.class, Integer.class, String.class, Long.class, String.class
-            };
-            public Class getColumnClass(int columnIndex) {
+        tableNodeStatus.setModel(new DefaultTableModel(new Object[][] {{null, null, null, null, null, null},}, new String[] {"Time", "Node ID",
+            "Group ID", "State", "App UID", "App Name"}) {
+            Class<?>[] columnTypes = new Class[] {String.class, Long.class, Short.class, Short.class, Long.class, String.class};
+
+            public Class<?> getColumnClass(int columnIndex) {
                 return columnTypes[columnIndex];
             }
         });
@@ -677,7 +691,12 @@ public class MainWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                startMoteMessageService();
+                if (moteMessageService.getStatus() == State.Stopped) {
+                    startMoteMessageService();
+                } else {
+                    stopMoteMessageService();
+                }
+
             }
         });
         btnConnection.setBackground(Color.RED);

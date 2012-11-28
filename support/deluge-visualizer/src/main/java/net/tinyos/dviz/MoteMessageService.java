@@ -88,6 +88,10 @@ public class MoteMessageService {
         this.subscribers = subscribers;
     }
 
+    public State getStatus() {
+        return status;
+    }
+
     public ServiceStatus start(String source) {
 
         this.source = source;
