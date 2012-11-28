@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+
+message_dir="src/main/java/net/tinyos/dviz/message"
+
+if [ ! -d "$message_dir" ]; then
+    mkdir $message_dir;
+fi
+
+mig java -target=null -java-classname=net.tinyos.dviz.message.NodeStatus ../../tos/lib/net/Deluge/Deluge.h NodeStatus -o src/main/java/net/tinyos/dviz/message/NodeStatus.java
