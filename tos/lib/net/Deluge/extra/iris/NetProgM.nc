@@ -43,71 +43,80 @@
 #include "AM.h"
 
 module NetProgM {
-  provides {
-    interface NetProg;
-    interface Init;
-  }
-  uses {
-    interface InternalFlash as IFlash;
-    interface Crc;
-    interface Leds;
-    async command void setAmAddress(am_addr_t a);
-  }
+    provides {
+        interface NetProg;
+        interface Init;
+    }
+    uses {
+        interface InternalFlash as IFlash;
+        interface Crc;
+        interface Leds;
+        async command void setAmAddress(am_addr_t a);
+    }
 }
 
 implementation {
 
-  command error_t Init.init()
-  {
-    BootArgs bootArgs;
-    call IFlash.read((uint8_t*)TOSBOOT_ARGS_ADDR, &bootArgs, sizeof(bootArgs));
+    command error_t Init.init()
+    {
+        BootArgs bootArgs;
+        call IFlash.read((uint8_t*)TOSBOOT_ARGS_ADDR, &bootArgs, sizeof(bootArgs));
 
-    // Update the local node ID
-    if (bootArgs.address != 0xFFFF) {
-      TOS_NODE_ID = bootArgs.address;
-      call setAmAddress(bootArgs.address);
+        // Update the local node ID
+        if (bootArgs.address != 0xFFFF) {
+            TOS_NODE_ID = bootArgs.address;
+            call setAmAddress(bootArgs.address);
+        }
+
+        if (bootArgs.groupId != 0xFFFF) {
+
+            //Update the local group ID
+            DELUGE_GROUP_ID = bootArgs.groupId;
+        }
+
+
+        return SUCCESS;
     }
 
-    return SUCCESS;
-  }
+    command error_t NetProg.reboot()
+    {
+        BootArgs bootArgs;
 
-  command error_t NetProg.reboot()
-  {
-    BootArgs bootArgs;
+        atomic {
+            call IFlash.read((uint8_t*)TOSBOOT_ARGS_ADDR, &bootArgs, sizeof(bootArgs));
 
-    atomic {
-      call IFlash.read((uint8_t*)TOSBOOT_ARGS_ADDR, &bootArgs, sizeof(bootArgs));
+            if (bootArgs.address != TOS_NODE_ID || bootArgs.groupId != DELUGE_GROUP_ID) {
+                bootArgs.address = TOS_NODE_ID;
+                bootArgs.groupId = DELUGE_GROUP_ID;
+                call IFlash.write((uint8_t*)TOSBOOT_ARGS_ADDR, &bootArgs, sizeof(bootArgs));
+            }
+            netprog_reboot();
+        }
 
-      if (bootArgs.address != TOS_NODE_ID) {
-	bootArgs.address = TOS_NODE_ID;
-	call IFlash.write((uint8_t*)TOSBOOT_ARGS_ADDR, &bootArgs, sizeof(bootArgs));
-      }
-      netprog_reboot();
+        return FAIL;
     }
 
-    return FAIL;
-  }
+    command error_t NetProg.programImageAndReboot(uint32_t imgAddr)
+    {
+        BootArgs bootArgs;
 
-  command error_t NetProg.programImageAndReboot(uint32_t imgAddr)
-  {
-    BootArgs bootArgs;
+        atomic {
+            call IFlash.read((uint8_t*)TOSBOOT_ARGS_ADDR, &bootArgs, sizeof(bootArgs));
 
-    atomic {
-      call IFlash.read((uint8_t*)TOSBOOT_ARGS_ADDR, &bootArgs, sizeof(bootArgs));
+            bootArgs.imageAddr = imgAddr;
+            bootArgs.gestureCount = 0xff;
+            bootArgs.noReprogram = FALSE;
+            bootArgs.address = TOS_NODE_ID;
+            bootArgs.groupId = DELUGE_GROUP_ID;
 
-      bootArgs.imageAddr = imgAddr;
-      bootArgs.gestureCount = 0xff;
-      bootArgs.noReprogram = FALSE;
-      bootArgs.address = TOS_NODE_ID;
+            call IFlash.write((uint8_t*)TOSBOOT_ARGS_ADDR, &bootArgs, sizeof(bootArgs));
 
-      call IFlash.write((uint8_t*)TOSBOOT_ARGS_ADDR, &bootArgs, sizeof(bootArgs));
+            // reboot
+            netprog_reboot();
+        }
 
-      // reboot
-      netprog_reboot();
+        // couldn't reboot
+        return FAIL;
     }
-
-    // couldn't reboot
-    return FAIL;
-  }
 
 }

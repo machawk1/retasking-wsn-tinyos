@@ -106,6 +106,7 @@ typedef struct BootArgs {
   uint32_t imageAddr;
   uint8_t  gestureCount;
   bool     noReprogram;
+  uint8_t groupId;
 } BootArgs;
 
 #endif
