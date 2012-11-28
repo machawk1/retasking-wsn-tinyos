@@ -110,7 +110,9 @@ implementation
             newNodeStatus->nodeId = TOS_NODE_ID;
             newNodeStatus->groupId = DELUGE_GROUP_ID;
             newNodeStatus->state = state;
-            newNodeStatus->appUid = TOS_NODE_ID * 2; //Fix this!
+            newNodeStatus->appUid = IDENT_UIDHASH;
+            memcpy(newNodeStatus->appName, IDENT_APPNAME, sizeof(IDENT_APPNAME));
+            newNodeStatus->appTimeStamp = IDENT_TIMESTAMP;
 
 
             //Send the message

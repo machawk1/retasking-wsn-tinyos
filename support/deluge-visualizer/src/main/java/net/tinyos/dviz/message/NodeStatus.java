@@ -9,12 +9,12 @@ package net.tinyos.dviz.message;
 public class NodeStatus extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 10;
+    public static final int DEFAULT_MESSAGE_SIZE = 28;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 85;
 
-    /** Create a new NodeStatus of size 10. */
+    /** Create a new NodeStatus of size 28. */
     public NodeStatus() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -98,6 +98,16 @@ public class NodeStatus extends net.tinyos.message.Message {
       try {
         s += "  [appUid=0x"+Long.toHexString(get_appUid())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [appName=";
+        for (int i = 0; i < 16; i++) {
+          s += "0x"+Long.toHexString(getElement_appName(i) & 0xff)+" ";
+        }
+        s += "]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [appTimeStamp=0x"+Long.toHexString(get_appTimeStamp())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
 
@@ -105,9 +115,9 @@ public class NodeStatus extends net.tinyos.message.Message {
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: nodeId
-    //   Field type: long, unsigned
+    //   Field type: int, unsigned
     //   Offset (bits): 0
-    //   Size (bits): 32
+    //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
@@ -139,37 +149,37 @@ public class NodeStatus extends net.tinyos.message.Message {
     }
 
     /**
-     * Return the value (as a long) of the field 'nodeId'
+     * Return the value (as a int) of the field 'nodeId'
      */
-    public long get_nodeId() {
-        return (long)getUIntBEElement(offsetBits_nodeId(), 32);
+    public int get_nodeId() {
+        return (int)getUIntBEElement(offsetBits_nodeId(), 16);
     }
 
     /**
      * Set the value of the field 'nodeId'
      */
-    public void set_nodeId(long value) {
-        setUIntBEElement(offsetBits_nodeId(), 32, value);
+    public void set_nodeId(int value) {
+        setUIntBEElement(offsetBits_nodeId(), 16, value);
     }
 
     /**
      * Return the size, in bytes, of the field 'nodeId'
      */
     public static int size_nodeId() {
-        return (32 / 8);
+        return (16 / 8);
     }
 
     /**
      * Return the size, in bits, of the field 'nodeId'
      */
     public static int sizeBits_nodeId() {
-        return 32;
+        return 16;
     }
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: groupId
     //   Field type: short, unsigned
-    //   Offset (bits): 32
+    //   Offset (bits): 16
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -191,14 +201,14 @@ public class NodeStatus extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'groupId'
      */
     public static int offset_groupId() {
-        return (32 / 8);
+        return (16 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'groupId'
      */
     public static int offsetBits_groupId() {
-        return 32;
+        return 16;
     }
 
     /**
@@ -232,7 +242,7 @@ public class NodeStatus extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: state
     //   Field type: short, unsigned
-    //   Offset (bits): 40
+    //   Offset (bits): 24
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -254,14 +264,14 @@ public class NodeStatus extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'state'
      */
     public static int offset_state() {
-        return (40 / 8);
+        return (24 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'state'
      */
     public static int offsetBits_state() {
-        return 40;
+        return 24;
     }
 
     /**
@@ -295,7 +305,7 @@ public class NodeStatus extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: appUid
     //   Field type: long, unsigned
-    //   Offset (bits): 48
+    //   Offset (bits): 32
     //   Size (bits): 32
     /////////////////////////////////////////////////////////
 
@@ -317,14 +327,14 @@ public class NodeStatus extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'appUid'
      */
     public static int offset_appUid() {
-        return (48 / 8);
+        return (32 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'appUid'
      */
     public static int offsetBits_appUid() {
-        return 48;
+        return 32;
     }
 
     /**
@@ -352,6 +362,222 @@ public class NodeStatus extends net.tinyos.message.Message {
      * Return the size, in bits, of the field 'appUid'
      */
     public static int sizeBits_appUid() {
+        return 32;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: appName
+    //   Field type: short[], unsigned
+    //   Offset (bits): 64
+    //   Size of each element (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'appName' is signed (false).
+     */
+    public static boolean isSigned_appName() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'appName' is an array (true).
+     */
+    public static boolean isArray_appName() {
+        return true;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'appName'
+     */
+    public static int offset_appName(int index1) {
+        int offset = 64;
+        if (index1 < 0 || index1 >= 16) throw new ArrayIndexOutOfBoundsException();
+        offset += 0 + index1 * 8;
+        return (offset / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'appName'
+     */
+    public static int offsetBits_appName(int index1) {
+        int offset = 64;
+        if (index1 < 0 || index1 >= 16) throw new ArrayIndexOutOfBoundsException();
+        offset += 0 + index1 * 8;
+        return offset;
+    }
+
+    /**
+     * Return the entire array 'appName' as a short[]
+     */
+    public short[] get_appName() {
+        short[] tmp = new short[16];
+        for (int index0 = 0; index0 < numElements_appName(0); index0++) {
+            tmp[index0] = getElement_appName(index0);
+        }
+        return tmp;
+    }
+
+    /**
+     * Set the contents of the array 'appName' from the given short[]
+     */
+    public void set_appName(short[] value) {
+        for (int index0 = 0; index0 < value.length; index0++) {
+            setElement_appName(index0, value[index0]);
+        }
+    }
+
+    /**
+     * Return an element (as a short) of the array 'appName'
+     */
+    public short getElement_appName(int index1) {
+        return (short)getUIntBEElement(offsetBits_appName(index1), 8);
+    }
+
+    /**
+     * Set an element of the array 'appName'
+     */
+    public void setElement_appName(int index1, short value) {
+        setUIntBEElement(offsetBits_appName(index1), 8, value);
+    }
+
+    /**
+     * Return the total size, in bytes, of the array 'appName'
+     */
+    public static int totalSize_appName() {
+        return (128 / 8);
+    }
+
+    /**
+     * Return the total size, in bits, of the array 'appName'
+     */
+    public static int totalSizeBits_appName() {
+        return 128;
+    }
+
+    /**
+     * Return the size, in bytes, of each element of the array 'appName'
+     */
+    public static int elementSize_appName() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of each element of the array 'appName'
+     */
+    public static int elementSizeBits_appName() {
+        return 8;
+    }
+
+    /**
+     * Return the number of dimensions in the array 'appName'
+     */
+    public static int numDimensions_appName() {
+        return 1;
+    }
+
+    /**
+     * Return the number of elements in the array 'appName'
+     */
+    public static int numElements_appName() {
+        return 16;
+    }
+
+    /**
+     * Return the number of elements in the array 'appName'
+     * for the given dimension.
+     */
+    public static int numElements_appName(int dimension) {
+      int array_dims[] = { 16,  };
+        if (dimension < 0 || dimension >= 1) throw new ArrayIndexOutOfBoundsException();
+        if (array_dims[dimension] == 0) throw new IllegalArgumentException("Array dimension "+dimension+" has unknown size");
+        return array_dims[dimension];
+    }
+
+    /**
+     * Fill in the array 'appName' with a String
+     */
+    public void setString_appName(String s) { 
+         int len = s.length();
+         int i;
+         for (i = 0; i < len; i++) {
+             setElement_appName(i, (short)s.charAt(i));
+         }
+         setElement_appName(i, (short)0); //null terminate
+    }
+
+    /**
+     * Read the array 'appName' as a String
+     */
+    public String getString_appName() { 
+         char carr[] = new char[Math.min(net.tinyos.message.Message.MAX_CONVERTED_STRING_LENGTH,16)];
+         int i;
+         for (i = 0; i < carr.length; i++) {
+             if ((char)getElement_appName(i) == (char)0) break;
+             carr[i] = (char)getElement_appName(i);
+         }
+         return new String(carr,0,i);
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: appTimeStamp
+    //   Field type: long, unsigned
+    //   Offset (bits): 192
+    //   Size (bits): 32
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'appTimeStamp' is signed (false).
+     */
+    public static boolean isSigned_appTimeStamp() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'appTimeStamp' is an array (false).
+     */
+    public static boolean isArray_appTimeStamp() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'appTimeStamp'
+     */
+    public static int offset_appTimeStamp() {
+        return (192 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'appTimeStamp'
+     */
+    public static int offsetBits_appTimeStamp() {
+        return 192;
+    }
+
+    /**
+     * Return the value (as a long) of the field 'appTimeStamp'
+     */
+    public long get_appTimeStamp() {
+        return (long)getUIntBEElement(offsetBits_appTimeStamp(), 32);
+    }
+
+    /**
+     * Set the value of the field 'appTimeStamp'
+     */
+    public void set_appTimeStamp(long value) {
+        setUIntBEElement(offsetBits_appTimeStamp(), 32, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'appTimeStamp'
+     */
+    public static int size_appTimeStamp() {
+        return (32 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'appTimeStamp'
+     */
+    public static int sizeBits_appTimeStamp() {
         return 32;
     }
 
