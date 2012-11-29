@@ -68,7 +68,7 @@ implementation {
             call setAmAddress(bootArgs.address);
         }
 
-        if (bootArgs.groupId != 0xFFFF) {
+        if (bootArgs.groupId != 0xFF) {
 
             //Update the local group ID
             DELUGE_GROUP_ID = bootArgs.groupId;
