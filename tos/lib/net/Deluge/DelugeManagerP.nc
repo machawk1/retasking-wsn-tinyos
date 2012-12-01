@@ -188,6 +188,8 @@ implementation
 
     event message_t* NodeStatusReceive.receive(message_t* msg, void* payload, uint8_t len)
     {
+        call Leds.led1Toggle();
+
         //Check to make sure payload size is correct
         if((len == sizeof(NodeStatus)) && (serialBusy == FALSE))
         {

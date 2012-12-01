@@ -75,9 +75,6 @@ implementation
   components new BlockStorageLockClientC();
   components MainC;
   
-  //Start CollectionC at boot (for Root and Nodes)
-  components CollectionStarterC;
-
   DelugeP.Boot -> MainC;
   DelugeP.Leds = Leds;  
 #ifndef DELUGE_BASESTATION
@@ -91,6 +88,11 @@ implementation
   components new TimerMilliC() as NodeStatusTimer;
   DelugeP.NodeStatusTimer -> NodeStatusTimer;
 #endif
+
+  components CollectionC;
+  DelugeP.RoutingControl -> CollectionC;
+  DelugeP.RootControl -> CollectionC;
+
   DelugeP.DisseminationStdControl -> DisseminationC;
   DelugeP.ObjectTransfer -> ObjectTransferC;
   DelugeP.NetProg -> NetProgC;

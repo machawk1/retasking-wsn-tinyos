@@ -54,6 +54,9 @@ module DelugeP
 
         //Interface for NodeStatus Timer
         interface Timer<TMilli> as NodeStatusTimer;
+
+        interface RootControl;
+        interface StdControl as RoutingControl;
     }
     provides {
         event void storageReady();
@@ -82,20 +85,25 @@ implementation
     event void Boot.booted()
     {
         lastCmd.uidhash = DELUGE_INVALID_UID;
-
-#ifndef DELUGE_BASESTATION
-        //Start the NodeStatusTimer after the radio has been started
-        //1024 ticks per second
-        //5 second perodic
-        call NodeStatusTimer.startPeriodic(5120);
-#endif
-
     }
 
     event void RadioSplitControl.startDone(error_t error)
     {
         if (error == SUCCESS) {
             call DisseminationStdControl.start();
+            call RoutingControl.start();
+
+#ifndef DELUGE_BASESTATION
+
+            //Start the NodeStatusTimer after the radio has been started
+            //1024 ticks per second
+            //5 second perodic
+            call NodeStatusTimer.startPeriodic(5120);
+#endif
+
+#ifdef DELUGE_BASESTATION
+            call RootControl.setRoot();
+#endif
 
         }
     }
