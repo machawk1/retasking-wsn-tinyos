@@ -19,7 +19,7 @@ public class NodeStatusMessageViewSync implements MessageListener {
 
         this.nodeStatusModel = nodeStatusModel;
         this.nodeIdRowIndex = new HashMap<Long, Integer>();
-        this.dateFormatter = new SimpleDateFormat();
+        this.dateFormatter = new SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss z");
     }
 
     @Override
@@ -42,9 +42,9 @@ public class NodeStatusMessageViewSync implements MessageListener {
                 nodeStatusModel.setValueAt(message.get_nodeId(), rowIndex, 1);
                 nodeStatusModel.setValueAt(message.get_groupId(), rowIndex, 2);
                 nodeStatusModel.setValueAt(message.get_state(), rowIndex, 3);
-                nodeStatusModel.setValueAt(message.get_appUid(), rowIndex, 4);
+                nodeStatusModel.setValueAt(String.format("0x%s", Long.toHexString(message.get_appUid())), rowIndex, 4);
                 nodeStatusModel.setValueAt(message.getString_appName(), rowIndex, 5);
-                nodeStatusModel.setValueAt(message.get_appTimeStamp(), rowIndex, 6);
+                nodeStatusModel.setValueAt(dateFormatter.format(new Date(message.get_appTimeStamp() * 1000)), rowIndex, 6);
 
             }
         };
@@ -57,9 +57,15 @@ public class NodeStatusMessageViewSync implements MessageListener {
             @Override
             public void run() {
 
-                nodeStatusModel.addRow(new Object[] {timeStamp, message.get_nodeId(), message.get_groupId(), message.get_state(),
-                    message.get_appUid(), message.getString_appName(), message.get_appTimeStamp()});
-
+                nodeStatusModel.addRow(new Object[] 
+                        {
+                            timeStamp, 
+                            message.get_nodeId(), 
+                            message.get_groupId(), 
+                            message.get_state(),
+                            String.format("0x%s", Long.toHexString(message.get_appUid())), 
+                            message.getString_appName(), 
+                            dateFormatter.format(new Date(message.get_appTimeStamp() * 1000))});
             }
         };
 

@@ -1,5 +1,6 @@
 package net.tinyos.dviz;
 
+import javax.swing.table.DefaultTableCellRenderer;
 import net.tinyos.dviz.message.NodeStatus;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -147,7 +148,15 @@ public class MainWindow extends JFrame {
 
     private void initializeSettingsDialog() {
 
-        settingsDialog = new SettingsDialog("serial@/dev/ttyUSB1:57600", "tos-deluge");
+        String defaultSource = "serial@/dev/ttyUSB1:57600";
+
+        System.out.println(System.getProperty("os.name"));
+
+        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+            defaultSource = "serial@COM9:57600";
+        }
+
+        settingsDialog = new SettingsDialog(defaultSource, "tos-deluge");
     }
 
     private void initializeMoteMessageService() {
@@ -662,22 +671,23 @@ public class MainWindow extends JFrame {
 
     private void initializeNodeTable(JTable tbNodeStatus2) {
 
-        tableNodeStatus.setModel(new DefaultTableModel(
-            new Object[][] {
-                {null, null, null, null, null, null, null},
-            },
-            new String[] {
-                "Last Updated", "Node ID", "Group ID", "State", "App UID", "App Name", "App TimeStamp"
-            }
-        ) {
-            Class[] columnTypes = new Class[] {
-                String.class, Integer.class, Short.class, Short.class, Long.class, String.class, Long.class
-            };
+        DefaultTableCellRenderer rightHorizontalAlignment = new DefaultTableCellRenderer();
+        rightHorizontalAlignment.setHorizontalAlignment(JLabel.RIGHT);
+
+        tableNodeStatus.setModel(new DefaultTableModel(new Object[][] {}, new String[] {"Last Updated", "Node ID", "Group ID", "State", "App UID",
+            "App Name", "App TimeStamp"}) {
+            Class[] columnTypes = new Class[] {String.class, Integer.class, Short.class, Short.class, String.class, String.class, String.class};
+
             public Class getColumnClass(int columnIndex) {
                 return columnTypes[columnIndex];
             }
         });
-        tableNodeStatus.getColumnModel().getColumn(6).setPreferredWidth(85);
+
+        tableNodeStatus.getColumnModel().getColumn(0).setPreferredWidth(140);
+        tableNodeStatus.getColumnModel().getColumn(6).setPreferredWidth(140);
+        
+        tableNodeStatus.getColumnModel().getColumn(4).setCellRenderer(rightHorizontalAlignment);
+        tableNodeStatus.getColumnModel().getColumn(5).setCellRenderer(rightHorizontalAlignment);
 
     }
 
