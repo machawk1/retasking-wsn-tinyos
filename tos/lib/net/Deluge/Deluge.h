@@ -86,7 +86,7 @@ typedef nx_struct NodeStatus {
     nx_uint8_t groupId;
     nx_uint8_t state;
     nx_uint32_t appUid;
-    nx_uint8_t appName[16];
+    nx_uint8_t appName[8];
     nx_uint32_t appTimeStamp; //Seconds since epoch
 } NodeStatus;
 

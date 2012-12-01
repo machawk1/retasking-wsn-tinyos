@@ -82,6 +82,14 @@ implementation
     event void Boot.booted()
     {
         lastCmd.uidhash = DELUGE_INVALID_UID;
+
+#ifndef DELUGE_BASESTATION
+        //Start the NodeStatusTimer after the radio has been started
+        //1024 ticks per second
+        //5 second perodic
+        call NodeStatusTimer.startPeriodic(5120);
+#endif
+
     }
 
     event void RadioSplitControl.startDone(error_t error)
@@ -89,36 +97,50 @@ implementation
         if (error == SUCCESS) {
             call DisseminationStdControl.start();
 
-#ifndef DELUGE_BASESTATION
-            //Start the NodeStatusTimer after the radio has been started
-            //1024 ticks per second
-            //5 second perodic
-            call NodeStatusTimer.startPeriodic(5120);
-#endif
         }
     }
 
     //Send NodeStatus message (via Collection)
     event void NodeStatusTimer.fired()
     {
+        size_t size;
+
         //Get payload (NodeStatus)
-        NodeStatus *newNodeStatus = call NodeStatusSender.getPayload(&nodeStatusMsg, sizeof(NodeStatus));
+        NodeStatus *newNodeStatus = (NodeStatus *)call NodeStatusSender.getPayload(&nodeStatusMsg, sizeof(NodeStatus));
 
         if(newNodeStatus != NULL)
         {
+
+            call Leds.led2Toggle();
+
             //Fill in payload
             newNodeStatus->nodeId = TOS_NODE_ID;
             newNodeStatus->groupId = DELUGE_GROUP_ID;
             newNodeStatus->state = state;
             newNodeStatus->appUid = IDENT_UIDHASH;
-            memcpy(newNodeStatus->appName, IDENT_APPNAME, sizeof(IDENT_APPNAME));
             newNodeStatus->appTimeStamp = IDENT_TIMESTAMP;
 
+            //Set all the values in the appName byte array to 0
+            memset(newNodeStatus->appName, 0, sizeof(newNodeStatus->appName)); 
+
+            //Check size and do not exceed appName size
+            if (sizeof(IDENT_APPNAME) > sizeof(newNodeStatus->appName)) 
+            {
+                size = sizeof(newNodeStatus->appName);
+            }
+            else
+            {
+                size = sizeof(IDENT_APPNAME);
+            }
+
+            //Copy the array to appName
+            memcpy(newNodeStatus->appName, IDENT_APPNAME, size);
 
             //Send the message
             if(call NodeStatusSender.send(&nodeStatusMsg, sizeof(NodeStatus)) != SUCCESS)
             {
                 //Failed - do something with LEDS?
+                call Leds.led0Toggle();
             }
 
         }
@@ -200,7 +222,7 @@ implementation
                                 // statement from this function.
                                 break;
                             }
-                    }
+                        }
                         call stop();
                     }
                     if (cmd->uidhash != IDENT_UIDHASH) {
@@ -221,7 +243,7 @@ implementation
                                 // statement from this function.
                                 break;
                             }
-                    }
+                        }
                         call stop();
                     }
                     if (cmd->uidhash != IDENT_UIDHASH) {
@@ -272,7 +294,7 @@ implementation
         //    printf("readDone 0x%lx imgNum: %d size: %lu\n", lastCmd.uidhash, lastCmd.imgNum, lastCmd.size);
         if (ident->uidhash == lastCmd.uidhash) {
             if (lastCmd.type == DELUGE_CMD_DISSEMINATE_AND_REPROGRAM ||
-                lastCmd.type == DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES) {
+                    lastCmd.type == DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES) {
                 call NetProg.programImageAndReboot(call StorageMap.getPhysicalAddress[imgNum](0));
             } else {
                 // We already have the image so we'll go ahead and start publishing.
@@ -298,7 +320,7 @@ implementation
         }
     }
 
-    event void NodeStatusSender.sendDone(message_t *msg, error_t ok) { }
+    event void NodeStatusSender.sendDone(message_t *msg, error_t ok) { call Leds.led1Toggle(); }
 
     event void DelugeVolumeManager.eraseDone(uint8_t imgNum) {}
     event void RadioSplitControl.stopDone(error_t error) {}
