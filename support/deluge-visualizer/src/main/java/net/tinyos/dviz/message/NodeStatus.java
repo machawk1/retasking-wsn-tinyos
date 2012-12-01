@@ -9,12 +9,12 @@ package net.tinyos.dviz.message;
 public class NodeStatus extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 28;
+    public static final int DEFAULT_MESSAGE_SIZE = 20;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 85;
 
-    /** Create a new NodeStatus of size 28. */
+    /** Create a new NodeStatus of size 20. */
     public NodeStatus() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -100,7 +100,7 @@ public class NodeStatus extends net.tinyos.message.Message {
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [appName=";
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < 8; i++) {
           s += "0x"+Long.toHexString(getElement_appName(i) & 0xff)+" ";
         }
         s += "]\n";
@@ -391,7 +391,7 @@ public class NodeStatus extends net.tinyos.message.Message {
      */
     public static int offset_appName(int index1) {
         int offset = 64;
-        if (index1 < 0 || index1 >= 16) throw new ArrayIndexOutOfBoundsException();
+        if (index1 < 0 || index1 >= 8) throw new ArrayIndexOutOfBoundsException();
         offset += 0 + index1 * 8;
         return (offset / 8);
     }
@@ -401,7 +401,7 @@ public class NodeStatus extends net.tinyos.message.Message {
      */
     public static int offsetBits_appName(int index1) {
         int offset = 64;
-        if (index1 < 0 || index1 >= 16) throw new ArrayIndexOutOfBoundsException();
+        if (index1 < 0 || index1 >= 8) throw new ArrayIndexOutOfBoundsException();
         offset += 0 + index1 * 8;
         return offset;
     }
@@ -410,7 +410,7 @@ public class NodeStatus extends net.tinyos.message.Message {
      * Return the entire array 'appName' as a short[]
      */
     public short[] get_appName() {
-        short[] tmp = new short[16];
+        short[] tmp = new short[8];
         for (int index0 = 0; index0 < numElements_appName(0); index0++) {
             tmp[index0] = getElement_appName(index0);
         }
@@ -444,14 +444,14 @@ public class NodeStatus extends net.tinyos.message.Message {
      * Return the total size, in bytes, of the array 'appName'
      */
     public static int totalSize_appName() {
-        return (128 / 8);
+        return (64 / 8);
     }
 
     /**
      * Return the total size, in bits, of the array 'appName'
      */
     public static int totalSizeBits_appName() {
-        return 128;
+        return 64;
     }
 
     /**
@@ -479,7 +479,7 @@ public class NodeStatus extends net.tinyos.message.Message {
      * Return the number of elements in the array 'appName'
      */
     public static int numElements_appName() {
-        return 16;
+        return 8;
     }
 
     /**
@@ -487,7 +487,7 @@ public class NodeStatus extends net.tinyos.message.Message {
      * for the given dimension.
      */
     public static int numElements_appName(int dimension) {
-      int array_dims[] = { 16,  };
+      int array_dims[] = { 8,  };
         if (dimension < 0 || dimension >= 1) throw new ArrayIndexOutOfBoundsException();
         if (array_dims[dimension] == 0) throw new IllegalArgumentException("Array dimension "+dimension+" has unknown size");
         return array_dims[dimension];
@@ -509,7 +509,7 @@ public class NodeStatus extends net.tinyos.message.Message {
      * Read the array 'appName' as a String
      */
     public String getString_appName() { 
-         char carr[] = new char[Math.min(net.tinyos.message.Message.MAX_CONVERTED_STRING_LENGTH,16)];
+         char carr[] = new char[Math.min(net.tinyos.message.Message.MAX_CONVERTED_STRING_LENGTH,8)];
          int i;
          for (i = 0; i < carr.length; i++) {
              if ((char)getElement_appName(i) == (char)0) break;
@@ -521,7 +521,7 @@ public class NodeStatus extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: appTimeStamp
     //   Field type: long, unsigned
-    //   Offset (bits): 192
+    //   Offset (bits): 128
     //   Size (bits): 32
     /////////////////////////////////////////////////////////
 
@@ -543,14 +543,14 @@ public class NodeStatus extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'appTimeStamp'
      */
     public static int offset_appTimeStamp() {
-        return (192 / 8);
+        return (128 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'appTimeStamp'
      */
     public static int offsetBits_appTimeStamp() {
-        return 192;
+        return 128;
     }
 
     /**
