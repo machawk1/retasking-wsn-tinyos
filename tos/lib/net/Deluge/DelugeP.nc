@@ -289,6 +289,7 @@ implementation
                     break;
                 case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM:
                 case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES:
+                case DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_GROUP:
                     call NetProg.programImageAndReboot(call StorageMap.getPhysicalAddress[lastCmd.imgNum](0));
                     break;
             }
@@ -302,7 +303,8 @@ implementation
         //    printf("readDone 0x%lx imgNum: %d size: %lu\n", lastCmd.uidhash, lastCmd.imgNum, lastCmd.size);
         if (ident->uidhash == lastCmd.uidhash) {
             if (lastCmd.type == DELUGE_CMD_DISSEMINATE_AND_REPROGRAM ||
-                    lastCmd.type == DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES) {
+                lastCmd.type == DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_NODES ||
+                lastCmd.type == DELUGE_CMD_DISSEMINATE_AND_REPROGRAM_GROUP) {
                 call NetProg.programImageAndReboot(call StorageMap.getPhysicalAddress[imgNum](0));
             } else {
                 // We already have the image so we'll go ahead and start publishing.
