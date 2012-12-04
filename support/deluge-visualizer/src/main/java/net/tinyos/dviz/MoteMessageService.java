@@ -83,6 +83,10 @@ public class MoteMessageService {
     private List<MessageSubscriber> subscribers;
     private String source;
 
+    public String getSource() {
+        return source;
+    }
+
     public MoteMessageService(List<MessageSubscriber> subscribers) {
 
         this.subscribers = subscribers;

@@ -69,7 +69,7 @@ public class MainWindow extends JFrame {
     private NodeIdsHashCreator nodeIdsHashCreator;
     private MoteMessageService moteMessageService;
     private TosDelugeCommandFactory tosDelugeCommandFactory;
-    private ProcessExecutor processExecutor;
+    private TosDelugeCoordinator tosDelugeCoordinator;
     private JLabel lblDrgGroupId;
     private JButton btnDrgExecute;
     private JTextField tfPingCmd;
@@ -84,8 +84,8 @@ public class MainWindow extends JFrame {
         initializeNodeIdsHashCreator();
         initializeSettingsDialog();
         initializeTosDelugeCommandFactory();
-        initializeProcessExecutor();
         initializeMoteMessageService();
+        initializeTosDelugeCoordinator();
         initializeCommandTextFields();
     }
 
@@ -129,11 +129,13 @@ public class MainWindow extends JFrame {
         tfUngCmd.setText(buildUpdateNodeGroupCommand().toString());
     }
 
-    private void initializeProcessExecutor() {
+    private void initializeTosDelugeCoordinator() {
 
         HashMap<String, String> envVariables = new HashMap<String, String>();
         envVariables.put("TOSROOT", "/opt/retasking-wsn-tinyos");
-        processExecutor = new ProcessExecutor(envVariables);
+        ProcessExecutor processExecutor = new ProcessExecutor(envVariables);
+
+        tosDelugeCoordinator = new TosDelugeCoordinator(moteMessageService, processExecutor);
     }
 
     private void initializeTosDelugeCommandFactory() {
@@ -391,13 +393,13 @@ public class MainWindow extends JFrame {
     private void executeInstall() {
 
         // Execute and display command results
-        displayTosDelugeResults(processExecutor.execute(buildInstallCommand()));
+        displayTosDelugeResults(tosDelugeCoordinator.execute(buildInstallCommand()));
     }
 
     private void executePing() {
 
         // Execute and display command results
-        displayTosDelugeResults(processExecutor.execute(buildPingCommand()));
+        displayTosDelugeResults(tosDelugeCoordinator.execute(buildPingCommand()));
     }
 
     private ICommand buildPingCommand() {
@@ -418,7 +420,7 @@ public class MainWindow extends JFrame {
     private void executeDisseminateReboot() {
 
         // Execute and display command results
-        displayTosDelugeResults(processExecutor.execute(buildDisseminateRebootCommand()));
+        displayTosDelugeResults(tosDelugeCoordinator.execute(buildDisseminateRebootCommand()));
     }
 
     private ICommand buildDisseminateRebootNodesCommand() {
@@ -432,7 +434,7 @@ public class MainWindow extends JFrame {
 
     private void executeDisseminateRebootNodes() {
 
-        displayTosDelugeResults(processExecutor.execute(buildDisseminateRebootNodesCommand()));
+        displayTosDelugeResults(tosDelugeCoordinator.execute(buildDisseminateRebootNodesCommand()));
     }
 
     private ICommand buildDisseminateRebootGroupCommand() {
@@ -446,7 +448,7 @@ public class MainWindow extends JFrame {
 
     private void executeDisseminateRebootGroup() {
 
-        displayTosDelugeResults(processExecutor.execute(buildDisseminateRebootGroupCommand()));
+        displayTosDelugeResults(tosDelugeCoordinator.execute(buildDisseminateRebootGroupCommand()));
     }
 
     private ICommand buildUpdateNodeGroupCommand() {
@@ -460,7 +462,7 @@ public class MainWindow extends JFrame {
 
     private void executeUpdateNodeGroup() {
 
-        displayTosDelugeResults(processExecutor.execute(buildUpdateNodeGroupCommand()));
+        displayTosDelugeResults(tosDelugeCoordinator.execute(buildUpdateNodeGroupCommand()));
     }
 
     private void displayTosDelugeResults(ProcessResult processResult) {
@@ -685,7 +687,7 @@ public class MainWindow extends JFrame {
 
         tableNodeStatus.getColumnModel().getColumn(0).setPreferredWidth(140);
         tableNodeStatus.getColumnModel().getColumn(6).setPreferredWidth(140);
-        
+
         tableNodeStatus.getColumnModel().getColumn(4).setCellRenderer(rightHorizontalAlignment);
         tableNodeStatus.getColumnModel().getColumn(5).setCellRenderer(rightHorizontalAlignment);
 
