@@ -268,6 +268,7 @@ implementation
                         call stop();
 
                         DELUGE_GROUP_ID = cmd->groupId;
+                        call NetProg.reboot();
                     }
                 }
                 break;
