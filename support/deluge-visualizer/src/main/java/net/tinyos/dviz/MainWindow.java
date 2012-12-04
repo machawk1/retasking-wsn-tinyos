@@ -676,7 +676,7 @@ public class MainWindow extends JFrame {
 
         tableNodeStatus.setModel(new DefaultTableModel(new Object[][] {}, new String[] {"Last Updated", "Node ID", "Group ID", "State", "App UID",
             "App Name", "App TimeStamp"}) {
-            Class[] columnTypes = new Class[] {String.class, Integer.class, Short.class, Short.class, String.class, String.class, String.class};
+            Class[] columnTypes = new Class[] {String.class, Integer.class, Short.class, String.class, String.class, String.class, String.class};
 
             public Class getColumnClass(int columnIndex) {
                 return columnTypes[columnIndex];

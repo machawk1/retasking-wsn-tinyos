@@ -30,6 +30,19 @@ public class NodeStatusMessageViewSync implements MessageListener {
         // Update the Table Model
         updateTable(timeStamp, (NodeStatus) message);
     }
+    
+    private String convertStateToString(short state) {
+        
+        if(state == 0) {
+            return "IDLE";
+        } else if (state == 1) {
+            return "PUB";
+        } else if (state == 2) {
+            return "RECV";
+        } else {
+            return "UNKNOWN";
+        }
+    }
 
     private Runnable updateRow(final int rowIndex, final String timeStamp, final NodeStatus message) {
 
@@ -41,12 +54,14 @@ public class NodeStatusMessageViewSync implements MessageListener {
                 nodeStatusModel.setValueAt(timeStamp, rowIndex, 0);
                 nodeStatusModel.setValueAt(message.get_nodeId(), rowIndex, 1);
                 nodeStatusModel.setValueAt(message.get_groupId(), rowIndex, 2);
-                nodeStatusModel.setValueAt(message.get_state(), rowIndex, 3);
+                nodeStatusModel.setValueAt(convertStateToString(message.get_state()), rowIndex, 3);
                 nodeStatusModel.setValueAt(String.format("0x%s", Long.toHexString(message.get_appUid())), rowIndex, 4);
                 nodeStatusModel.setValueAt(message.getString_appName(), rowIndex, 5);
                 nodeStatusModel.setValueAt(dateFormatter.format(new Date(message.get_appTimeStamp() * 1000)), rowIndex, 6);
 
             }
+
+            
         };
     }
 
@@ -62,7 +77,7 @@ public class NodeStatusMessageViewSync implements MessageListener {
                             timeStamp, 
                             message.get_nodeId(), 
                             message.get_groupId(), 
-                            message.get_state(),
+                            convertStateToString(message.get_state()),
                             String.format("0x%s", Long.toHexString(message.get_appUid())), 
                             message.getString_appName(), 
                             dateFormatter.format(new Date(message.get_appTimeStamp() * 1000))});
