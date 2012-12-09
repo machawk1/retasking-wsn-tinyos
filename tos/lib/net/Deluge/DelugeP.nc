@@ -49,14 +49,13 @@ module DelugeP
         interface DelugeVolumeManager;
         interface Resource;
 
-        //Collection interface for sending NodeStatus messages
-        interface Send as NodeStatusSender;
-
-        //Interface for NodeStatus Timer
+        // Interface for NodeStatus Timer
         interface Timer<TMilli> as NodeStatusTimer;
 
+        // Interfaces for Collection (NodeStatus)
         interface RootControl;
         interface StdControl as RoutingControl;
+        interface Send as NodeStatusSender;
     }
     provides {
         event void storageReady();
@@ -91,16 +90,20 @@ implementation
     {
         if (error == SUCCESS) {
             call DisseminationStdControl.start();
+
+            // Start the Collection service (must be done after the radio has been started)
             call RoutingControl.start();
 
+            // Only start the timer if this is a client mote (not BaseStation)
 #ifndef DELUGE_BASESTATION
 
-            //Start the NodeStatusTimer after the radio has been started
-            //1024 ticks per second
-            //5 second perodic
+            // Start the NodeStatusTimer after the radio has been started
+            // 1024 ticks per second
+            // 5 second perodic
             call NodeStatusTimer.startPeriodic(5120);
 #endif
 
+            // Only set the BaseStation as the root node for Collection
 #ifdef DELUGE_BASESTATION
             call RootControl.setRoot();
 #endif
@@ -108,14 +111,15 @@ implementation
         }
     }
 
-    //Send NodeStatus message (via Collection)
+    // Send NodeStatus message (via Collection)
     event void NodeStatusTimer.fired()
     {
         size_t size;
 
-        //Get payload (NodeStatus)
+        // Get payload (NodeStatus)
         NodeStatus *newNodeStatus = (NodeStatus *)call NodeStatusSender.getPayload(&nodeStatusMsg, sizeof(NodeStatus));
 
+        // This will only be NULL if NodeStatus is larger than the maximum payload size (e.g. IRIS payload must be <= 20)
         if(newNodeStatus != NULL)
         {
 
@@ -180,6 +184,7 @@ implementation
     }
 
 
+    // Checks if the mote's TOS_NODE_ID is set in the nodeIds hash
     bool isNodeIdSet(uint32_t nodeIds) 
     {
         bool returnValue = FALSE;

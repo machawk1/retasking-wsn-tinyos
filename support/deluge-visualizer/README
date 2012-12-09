@@ -1,0 +1,3 @@
+Before building the project (via Maven) run the following scripts:
+ * INSTALL-TINYOS-JAR - installs the ../sdk/java/tinyos.jar into the .m2 directory (Maven dependency)
+ * RUN-MIG-NODESTATUS - runs the MIG tool to generate the NodeStatus.java class (seralizer)

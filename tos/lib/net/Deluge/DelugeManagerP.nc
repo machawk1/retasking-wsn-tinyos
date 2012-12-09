@@ -52,10 +52,10 @@ generic module DelugeManagerP()
         interface Resource;
         command void stop();
 
-        //Serial interface for NodeStatus messages
+        // Serial interface for NodeStatus messages
         interface AMSend as SerialNodeStatusSender;
 
-        //Collection interfaces for receiving NodeStatus messages
+        // Collection interfaces for receiving NodeStatus messages
         interface Receive as NodeStatusReceive;
     }
 }
@@ -180,37 +180,36 @@ implementation
 
     event void SerialNodeStatusSender.sendDone(message_t *msg, error_t error) 
     {
-        //Add logic to control serial data being sent - only send data when finished with previous message or
-        //use a queue (e.g MultihopOscilloscope)
-        
+        // Set serialBusy to false signaling serial communication completed
         serialBusy = FALSE;
     }
 
+    // Event called when a NodeStatus payload has been received (Collection)
     event message_t* NodeStatusReceive.receive(message_t* msg, void* payload, uint8_t len)
     {
         call Leds.led1Toggle();
 
-        //Check to make sure payload size is correct
+        // Check to make sure payload size is correct
         if((len == sizeof(NodeStatus)) && (serialBusy == FALSE))
         {
-            //Cast payload to NodeStatus
+            // Cast payload to NodeStatus
             NodeStatus *in = (NodeStatus*)payload;
 
-            //Build NodeStatus payload for sending to serial
+            // Build NodeStatus payload for sending to serial
             NodeStatus *out = (NodeStatus*)call SerialNodeStatusSender.getPayload(&serialNodeStatusMsg, sizeof(NodeStatus));
 
             if(out != NULL)
             {
-                //Copy "in" payload (Collection) to "out" payload (Serial)
+                // Copy "in" payload (Collection) to "out" payload (Serial)
                 memcpy(out, in, sizeof(NodeStatus));
 
-                //Set serialBusy flag
+                // Set serialBusy flag
                 serialBusy = TRUE;
 
-                //Send to serial 
+                // Send to serial 
                 if(call SerialNodeStatusSender.send(AM_BROADCAST_ADDR, &serialNodeStatusMsg, sizeof(NodeStatus)) != SUCCESS)
                 {
-                    //Do something if there is an error
+                    // Do something if there is an error
                     serialBusy = FALSE;
                 }
 
